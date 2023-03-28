@@ -1,0 +1,22 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build",
+            "command": "nmake.exe",
+            "args": ["build"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build project"
+        }
+    ],
+    "version": "2.0.0"
+}

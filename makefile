@@ -1,6 +1,10 @@
 build:
 	cl \
 	/Zi \
+	/EHsc \
+	/W4 \
+	/D_DEBUG \
+	/MDd \
 	/Femain.exe \
 	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\winrt" \
 	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um" \
