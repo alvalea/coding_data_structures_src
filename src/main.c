@@ -18,7 +18,7 @@ int main()
   _CrtMemState sDiff;
   _CrtMemCheckpoint(&sOld); //take a snapshot
 
-  test();
+  test_main();
 
   _CrtMemCheckpoint(&sNew); //take a snapshot
   if (_CrtMemDifference(&sDiff, &sOld, &sNew)) // if there is a difference
