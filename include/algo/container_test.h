@@ -12,4 +12,7 @@ int test_List_head();
 int test_List_tail();
 int test_List_find();
 
+int test_Queue_push();
+int test_Queue_pop();
+
 #endif

@@ -1,14 +1,16 @@
 #ifndef __ALGO_CONTAINER__
 #define __ALGO_CONTAINER__
 
+#include <stdbool.h>
+
 typedef struct Array Array;
 
-Array* new_Array(int item_size, int initial_capacity);
+Array* new_Array(size_t item_size, size_t initial_capacity);
 void delete_Array(Array* a);
 
-int Array_add(Array* a, void* item);
-void* Array_get(Array* a, int index);
-int Array_len(Array* a);
+size_t Array_add(Array* a, void* item);
+void* Array_get(Array* a, size_t index);
+size_t Array_len(Array* a);
 void  Array_clear(Array* a);
 
 //========================================================
@@ -20,7 +22,7 @@ ListNode* ListNode_next(ListNode* n);
 
 typedef struct List List;
 
-List* new_List(int item_size);
+List* new_List(size_t item_size);
 void delete_List(List* l);
 
 void* List_add(List* l, void* item);
@@ -28,5 +30,15 @@ void List_remove(List* l, void* item);
 ListNode* List_head(List* l);
 ListNode* List_tail(List* l);
 ListNode* List_find(List* l, void* item);
+
+//========================================================
+
+typedef struct Queue Queue;
+
+Queue* new_Queue(size_t item_size, size_t capacity);
+void delete_Queue(Queue* q);
+
+bool Queue_push(Queue* q, void* item);
+bool Queue_pop(Queue* q, void* item);
 
 #endif

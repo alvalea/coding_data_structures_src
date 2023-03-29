@@ -5,23 +5,23 @@
 #include <string.h>
 
 struct Array {
-  int item_size;
-  int capacity;
-  int len;
-  void* items;
+  size_t item_size;
+  size_t capacity;
+  size_t len;
+  void*  items;
 };
 
-Array* new_Array(int item_size, int initial_capacity) {
+Array* new_Array(size_t item_size, size_t capacity) {
   Array* a = calloc(1, sizeof(Array));
 
-  if (initial_capacity == 0) {
+  if (capacity == 0) {
     printf("Initial capacity should be higher than zero\n");
     exit(1);
   }
 
   a->item_size = item_size;
-  a->capacity  = initial_capacity;
-  a->items     = calloc(initial_capacity, item_size);
+  a->capacity  = capacity;
+  a->items     = calloc(capacity, item_size);
 
   return a;
 }
@@ -37,29 +37,29 @@ void Array_resize(Array* a) {
   a->items = realloc(a->items, a->capacity * a->item_size);
 }
 
-int Array_add(Array* a, void* item) {
+size_t Array_add(Array* a, void* item) {
   if (a->len == a->capacity) {
     Array_resize(a);
   }
-  int index = a->len;
-  int offset = index * a->item_size;
+  size_t index = a->len;
+  size_t offset = index * a->item_size;
   char* dst = (char*)a->items + offset;
   memcpy(dst, item, a->item_size);
   a->len++;
   return index;
 }
 
-void* Array_get(Array* a, int index) {
+void* Array_get(Array* a, size_t index) {
   if (index >= a->len) {
-    printf("Index out of bounds: len %d, index %d\n", a->len, index);
+    printf("Index out of bounds: len %zu, index %zu\n", a->len, index);
     exit(1);
   }
-  int offset = index * a->item_size;
+  size_t offset = index * a->item_size;
   char* item = (char*)a->items + offset;
   return item;
 }
 
-int Array_len(Array* a) {
+size_t Array_len(Array* a) {
   return a->len;
 }
 
@@ -89,12 +89,12 @@ void delete_ListNode(ListNode* n) {
 }
 
 struct List {
-   int item_size;
+   size_t item_size;
    ListNode* head;
    ListNode* tail;
 };
 
-List* new_List(int item_size) {
+List* new_List(size_t item_size) {
   List* l = calloc(1, sizeof(List));
   l->item_size = item_size;
   return l;
@@ -164,3 +164,57 @@ ListNode* List_find(List* l, void* item) {
   return NULL;
 }
 
+//========================================================
+
+struct Queue {
+  size_t item_size;
+  size_t front;
+  size_t capacity;
+  size_t count;
+  void*  items;
+};
+
+Queue* new_Queue(size_t item_size, size_t capacity) {
+  Queue* q = calloc(1, sizeof(Queue));
+
+  if (capacity == 0) {
+    printf("Initial capacity should be higher than zero\n");
+    exit(1);
+  }
+
+  q->item_size = item_size;
+  q->capacity  = capacity;
+  q->items     = calloc(capacity, item_size);
+
+  return q;
+}
+
+void delete_Queue(Queue* q) {
+  free(q->items);
+  free(q);
+}
+
+bool Queue_push(Queue* q, void* item) {
+  if (q->count == q->capacity) {
+    return false;
+  }
+  char* items = (char*)q->items;
+  size_t index = (q->front + q->count) % q->capacity;
+  char* dst = &items[index * q->item_size];
+  memcpy(dst, item, q->item_size);
+  q->count++;
+  return true;
+}
+
+bool Queue_pop(Queue* q, void* item) {
+  if (q->count == 0) {
+    return false;
+  }
+  char* items = (char*)q->items;
+  size_t index = q->front;
+  char* src = &items[index * q->item_size];
+  memcpy(item, src, q->item_size);
+  q->count--;
+  q->front = (q->front + 1) % q->capacity;
+  return true;
+}

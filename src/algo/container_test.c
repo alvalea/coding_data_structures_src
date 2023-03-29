@@ -126,3 +126,37 @@ int test_List_find() {
   delete_List(l);
   return 0;
 }
+
+int test_Queue_push() {
+  Queue* q = new_Queue(sizeof(int), 1);
+  {
+    int i = 3;
+    Queue_push(q, &i);
+    int x;
+    Queue_pop(q, &x);
+    if (x != i) {
+      return 1;
+    }
+  }
+  delete_Queue(q);
+  return 0;
+}
+
+int test_Queue_pop() {
+  int n = 5;
+  Queue* q = new_Queue(sizeof(int), n);
+  {
+    for (int i = 0; i<n; ++i) {
+      Queue_push(q, &i);
+    }
+    for (int i = 0; i<n; ++i) {
+      int x;
+      Queue_pop(q, &x);
+      if (x != i) {
+        return 1;
+      }
+    }
+  }
+  delete_Queue(q);
+  return 0;
+}
