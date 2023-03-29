@@ -1,8 +1,12 @@
-#include <test.h>
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
 
 #include <stdio.h>
 #include <algo/container_test.h>
 
+typedef int (*test_fn)();
+
+static
 void test(const char* test_name, test_fn fn) {
   printf("[%s]\t", test_name);
   if(fn()) {
@@ -13,6 +17,7 @@ void test(const char* test_name, test_fn fn) {
   printf("\033[0m \n");
 }
 
+static
 void test_main() {
   test("test_Array_add", test_Array_add);
   test("test_Array_get", test_Array_get);
@@ -27,4 +32,33 @@ void test_main() {
 
   test("test_Queue_push", test_Queue_push);
   test("test_Queue_pop", test_Queue_pop);
+}
+
+int main() {
+  _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+  _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+  _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+  _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDOUT);
+  _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+  _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
+
+  _CrtMemState sOld;
+  _CrtMemState sNew;
+  _CrtMemState sDiff;
+  _CrtMemCheckpoint(&sOld); //take a snapshot
+
+  test_main();
+
+  _CrtMemCheckpoint(&sNew); //take a snapshot
+  if (_CrtMemDifference(&sDiff, &sOld, &sNew)) // if there is a difference
+  {
+      printf("-----------_CrtMemDumpStatistics ---------\n");
+      _CrtMemDumpStatistics(&sDiff);
+      printf("-----------_CrtMemDumpAllObjectsSince ---------\n");
+      _CrtMemDumpAllObjectsSince(&sOld);
+      printf("-----------_CrtDumpMemoryLeaks ---------\n");
+      _CrtDumpMemoryLeaks();
+  }
+
+  return 0;
 }

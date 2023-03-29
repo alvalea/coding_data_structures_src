@@ -2,7 +2,6 @@
 #include <crtdbg.h>
 
 #include <stdio.h>
-#include <test.h>
 
 int main()
 {
@@ -18,7 +17,6 @@ int main()
   _CrtMemState sDiff;
   _CrtMemCheckpoint(&sOld); //take a snapshot
 
-  test_main();
 
   _CrtMemCheckpoint(&sNew); //take a snapshot
   if (_CrtMemDifference(&sDiff, &sOld, &sNew)) // if there is a difference
