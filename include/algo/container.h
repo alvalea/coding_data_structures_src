@@ -41,4 +41,18 @@ void delete_Queue(Queue* q);
 bool Queue_push(Queue* q, void* item);
 bool Queue_pop(Queue* q, void* item);
 
+//========================================================
+
+typedef struct Map Map;
+
+Map* new_Map(size_t key_size, size_t value_size);
+void delete_Map(Map* m);
+
+void Map_insert(Map* m, void* key, void* value);
+void Map_delete(Map* m, void* key);
+void* Map_find(Map* m, void* key);
+
+typedef void (*MapPrintFn)(void* value);
+void Map_print(Map* m, MapPrintFn print);
+
 #endif

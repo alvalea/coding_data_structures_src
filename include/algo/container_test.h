@@ -15,4 +15,8 @@ int test_List_find();
 int test_Queue_push();
 int test_Queue_pop();
 
+int test_Map_insert();
+int test_Map_delete();
+int test_Map_find();
+
 #endif

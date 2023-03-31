@@ -27,6 +27,12 @@
     <ClCompile Include="src\algo\container.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\algo\map.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\map_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algo\container.h">

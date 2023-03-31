@@ -32,6 +32,10 @@ void test_main() {
 
   test("test_Queue_push", test_Queue_push);
   test("test_Queue_pop", test_Queue_pop);
+
+  test("test_Map_insert", test_Map_insert);
+  test("test_Map_delete", test_Map_delete);
+  test("test_Map_find", test_Map_find);
 }
 
 int main() {

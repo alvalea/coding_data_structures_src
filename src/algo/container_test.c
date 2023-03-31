@@ -4,129 +4,139 @@
 #include <algo/container.h>
 
 int test_Array_add() {
+  int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
     int i = 3;
     Array_add(a, &i);
     if (Array_len(a) != 1) {
-      return 1;
+      result = -1;
     }
   }
   delete_Array(a);
-  return 0;
+  return result;
 }
 
 int test_Array_get() {
+  int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
     int i = 3;
     Array_add(a, &i);
     int* x = Array_get(a, 0);
     if (*x != i) {
-      return 1;
+      result = -1;
     }
   }
   delete_Array(a);
-  return 0;
+  return result;
 }
 
 int test_Array_len() {
+  int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
     int i = 3;
     Array_add(a, &i);
     if (Array_len(a) != 1) {
-      return 1;
+      result = -1;
     }
   }
   delete_Array(a);
-  return 0;
+  return result;
 }
 
 int test_Array_clear() {
+  int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
     int i = 3;
     Array_add(a, &i);
     Array_clear(a);
     if (Array_len(a) != 0) {
-      return 1;
+      result = -1;
     }
   }
   delete_Array(a);
-  return 0;
+  return result;
 }
 
 int test_List_add() {
+  int result = 0;
   List* l = new_List(sizeof(int));
   {
     int i = 3;
     int* x = List_add(l, &i);
     if (*x != i) {
-      return 1;
+      result = -1;
     }
   }
   delete_List(l);
-  return 0;
+  return result;
 }
 
 int test_List_remove() {
+  int result = 0;
   List* l = new_List(sizeof(int));
   {
     int i = 3;
     int* x = List_add(l, &i);
     List_remove(l, x);
     if (List_head(l) != NULL) {
-      return 1;
+      result = -1;
     }
   }
   delete_List(l);
-  return 0;
+  return result;
 }
 
 int test_List_head() {
+  int result = 0;
   List* l = new_List(sizeof(int));
   {
     int i = 3;
     int* x = List_add(l, &i);
     ListNode* head = List_head(l);
     if (ListNode_data(head) != x) {
-      return 1;
+      result = -1;
     }
   }
   delete_List(l);
-  return 0;
+  return result;
 }
 
 int test_List_tail() {
+  int result = 0;
   List* l = new_List(sizeof(int));
   {
     int i = 3;
     int* x = List_add(l, &i);
     ListNode* tail = List_tail(l);
     if (ListNode_data(tail) != x) {
-      return 1;
+      result = -1;
     }
   }
   delete_List(l);
-  return 0;
+  return result;
 }
 
 int test_List_find() {
+  int result = 0;
   List* l = new_List(sizeof(int));
   {
     int i = 3;
     int* x = List_add(l, &i);
     ListNode* item = List_find(l, x);
     if (ListNode_data(item) != x) {
-      return 1;
+      result = -1;
     }
   }
   delete_List(l);
-  return 0;
+  return result;
 }
 
 int test_Queue_push() {
+  int result = 0;
   Queue* q = new_Queue(sizeof(int), 1);
   {
     int i = 3;
@@ -134,14 +144,15 @@ int test_Queue_push() {
     int x;
     Queue_pop(q, &x);
     if (x != i) {
-      return 1;
+      result = -1;
     }
   }
   delete_Queue(q);
-  return 0;
+  return result;
 }
 
 int test_Queue_pop() {
+  int result = 0;
   int n = 5;
   Queue* q = new_Queue(sizeof(int), n);
   {
@@ -152,10 +163,10 @@ int test_Queue_pop() {
       int x;
       Queue_pop(q, &x);
       if (x != i) {
-        return 1;
+        result = -1;
       }
     }
   }
   delete_Queue(q);
-  return 0;
+  return result;
 }
