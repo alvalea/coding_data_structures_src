@@ -19,4 +19,8 @@ int test_Map_insert();
 int test_Map_delete();
 int test_Map_find();
 
+int test_HashMap_insert();
+int test_HashMap_delete();
+int test_HashMap_find();
+
 #endif

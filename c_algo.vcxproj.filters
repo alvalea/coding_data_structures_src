@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -31,6 +28,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\map_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\hashmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\hashmap_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

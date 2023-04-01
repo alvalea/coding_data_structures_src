@@ -55,4 +55,15 @@ void* Map_find(Map* m, void* key);
 typedef void (*MapPrintFn)(void* value);
 void Map_print(Map* m, MapPrintFn print);
 
+//========================================================
+
+typedef struct HashMap HashMap;
+
+HashMap* new_HashMap(size_t key_size, size_t value_size);
+void delete_HashMap(HashMap* m);
+
+void HashMap_insert(HashMap* m, void* key, void* value);
+void HashMap_delete(HashMap* m, void* key);
+void* HashMap_find(HashMap* m, void* key);
+
 #endif

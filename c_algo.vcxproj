@@ -132,9 +132,10 @@
   <ItemGroup>
     <ClCompile Include="src\algo\container.c" />
     <ClCompile Include="src\algo\container_test.c" />
+    <ClCompile Include="src\algo\hashmap.c" />
+    <ClCompile Include="src\algo\hashmap_test.c" />
     <ClCompile Include="src\algo\map.c" />
     <ClCompile Include="src\algo\map_test.c" />
-    <ClCompile Include="src\main.c" />
     <ClCompile Include="src\test.c" />
   </ItemGroup>
   <ItemGroup>

@@ -36,6 +36,10 @@ void test_main() {
   test("test_Map_insert", test_Map_insert);
   test("test_Map_delete", test_Map_delete);
   test("test_Map_find", test_Map_find);
+
+  test("test_HashMap_insert", test_HashMap_insert);
+  test("test_HashMap_delete", test_HashMap_delete);
+  test("test_HashMap_find", test_HashMap_find);
 }
 
 int main() {
