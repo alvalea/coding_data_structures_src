@@ -40,6 +40,9 @@ void test_main() {
   test("test_HashMap_insert", test_HashMap_insert);
   test("test_HashMap_delete", test_HashMap_delete);
   test("test_HashMap_find", test_HashMap_find);
+
+  test("test_Heap_push", test_Heap_push);
+  test("test_Heap_pop", test_Heap_pop);
 }
 
 int main() {

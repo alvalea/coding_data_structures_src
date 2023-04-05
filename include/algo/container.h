@@ -66,4 +66,17 @@ void HashMap_insert(HashMap* m, void* key, void* value);
 void HashMap_delete(HashMap* m, void* key);
 void* HashMap_find(HashMap* m, void* key);
 
+//========================================================
+
+typedef struct Heap Heap;
+
+Heap* new_Heap(size_t key_size, size_t value_size, size_t capacity);
+void delete_Heap(Heap* h);
+
+bool Heap_push(Heap* h, void* key, void* value);
+bool Heap_pop(Heap* h, void* value);
+
+typedef void (*HeapPrintFn)(void* value);
+void Heap_print(Heap* h, HeapPrintFn print);
+
 #endif

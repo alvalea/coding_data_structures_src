@@ -134,6 +134,8 @@
     <ClCompile Include="src\algo\container_test.c" />
     <ClCompile Include="src\algo\hashmap.c" />
     <ClCompile Include="src\algo\hashmap_test.c" />
+    <ClCompile Include="src\algo\heap.c" />
+    <ClCompile Include="src\algo\heap_test.c" />
     <ClCompile Include="src\algo\map.c" />
     <ClCompile Include="src\algo\map_test.c" />
     <ClCompile Include="src\test.c" />

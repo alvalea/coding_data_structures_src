@@ -23,4 +23,7 @@ int test_HashMap_insert();
 int test_HashMap_delete();
 int test_HashMap_find();
 
+int test_Heap_push();
+int test_Heap_pop();
+
 #endif
