@@ -11,7 +11,7 @@ typedef char string[STR];
 static
 void test_Heap_print(void* value) {
   int* v = (int*)value;
-  printf("%d",*v);
+  printf("%d ",*v);
 }
 
 int test_Heap_push() {
