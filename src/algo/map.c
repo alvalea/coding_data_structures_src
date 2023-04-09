@@ -348,19 +348,19 @@ void* Map_find(Map* m, void* key) {
 }
 
 static
-const char IDENT[5] = "    ";
+const char IDENT[] = "    ";
 
 static
-const char MIDDLE[5] = "---";
+const char MIDDLE[] = "---";
 
 static
-const char RIGHT[5] = ".---";
+const char RIGHT[] = ".---";
 
 static
-const char LEFT[5] = "`---";
+const char LEFT[] = "`---";
 
 static
-const char LATERAL[5] = "   |";
+const char LATERAL[] = "   |";
 
 typedef struct Trunk {
   struct Trunk* prev;
