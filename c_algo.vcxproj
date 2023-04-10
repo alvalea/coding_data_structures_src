@@ -138,11 +138,15 @@
     <ClCompile Include="src\algo\heap_test.c" />
     <ClCompile Include="src\algo\map.c" />
     <ClCompile Include="src\algo\map_test.c" />
+    <ClCompile Include="src\algo\sort.c" />
+    <ClCompile Include="src\algo\sort_test.c" />
     <ClCompile Include="src\test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algo\container.h" />
     <ClInclude Include="include\algo\container_test.h" />
+    <ClInclude Include="include\algo\sort.h" />
+    <ClInclude Include="include\algo\sort_test.h" />
     <ClInclude Include="include\test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

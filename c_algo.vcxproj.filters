@@ -42,6 +42,12 @@
     <ClCompile Include="src\algo\heap_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\algo\sort_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\sort.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algo\container.h">
@@ -51,6 +57,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\algo\sort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\algo\sort_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

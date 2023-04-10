@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <algo/container_test.h>
+#include <algo/sort_test.h>
 
 typedef int (*test_fn)();
 
@@ -43,6 +44,8 @@ void test_main() {
 
   test("test_Heap_push", test_Heap_push);
   test("test_Heap_pop", test_Heap_pop);
+
+  test("test_quicksort", test_quicksort);
 }
 
 int main() {
