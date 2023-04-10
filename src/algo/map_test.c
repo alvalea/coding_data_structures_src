@@ -14,9 +14,22 @@ void test_Map_print(void* value) {
   printf("%d\n",*v);
 }
 
+static
+int test_Map_compare(void* key1, void* key2) {
+  int i1 = atoi(key1);
+  int i2 = atoi(key2);
+  if (i1 < i2) {
+    return -1;
+  } else if (i1 > i2) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 int test_Map_insert() {
   int result = 0;
-  Map* m = new_Map(sizeof(string), sizeof(int));
+  Map* m = new_Map(sizeof(string), sizeof(int), test_Map_compare);
   {
     int i = 3;
     string str;
@@ -33,7 +46,7 @@ int test_Map_insert() {
 
 int test_Map_delete() {
   int result = 0;
-  Map* m = new_Map(sizeof(string), sizeof(int));
+  Map* m = new_Map(sizeof(string), sizeof(int), test_Map_compare);
   {
     int i = 3;
     string str;
@@ -50,7 +63,7 @@ int test_Map_delete() {
 
 int test_Map_find() {
   int result = 0;
-  Map* m = new_Map(sizeof(string), sizeof(int));
+  Map* m = new_Map(sizeof(string), sizeof(int), test_Map_compare);
   {
     int i = 3;
     string str;

@@ -45,7 +45,8 @@ bool Queue_pop(Queue* q, void* item);
 
 typedef struct Map Map;
 
-Map* new_Map(size_t key_size, size_t value_size);
+typedef int (*MapCompareFn)(void* key1, void* key2);
+Map* new_Map(size_t key_size, size_t value_size, MapCompareFn compare);
 void delete_Map(Map* m);
 
 void Map_insert(Map* m, void* key, void* value);

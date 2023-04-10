@@ -23,11 +23,14 @@ typedef struct MapNode {
   MapNodeColor color;
   void* key;
   void* value;
+  size_t key_size;
+  MapCompareFn compare;
 } MapNode;
 
 typedef struct Map {
   size_t key_size;
   size_t value_size;
+  MapCompareFn compare;
   MapNode* root;
   MapNode* NIL;
 } Map;
@@ -42,7 +45,7 @@ MapNode* new_MapNodeNIL(size_t key_size, size_t value_size) {
 }
 
 static
-MapNode* new_MapNode(MapNodeColor color, MapNodeKV* kv) {
+MapNode* new_MapNode(MapNodeColor color, MapNodeKV* kv, MapCompareFn compare) {
   MapNode* n = calloc(1, sizeof(MapNode));
   n->color = color;
 
@@ -51,6 +54,9 @@ MapNode* new_MapNode(MapNodeColor color, MapNodeKV* kv) {
 
   n->value = malloc(kv->value_size);
   memcpy(n->value, kv->value_data, kv->value_size);
+
+  n->key_size = kv->key_size;
+  n->compare = compare;
 
   return n;
 }
@@ -67,13 +73,24 @@ void delete_MapNode(MapNode* n, MapNode* nil) {
 }
 
 static
-MapNode* MapNode_find(MapNode* n, MapNode* nil, void* key, size_t key_size) {
+int MapNode_compare(MapNode* n, void* key1, void* key2) {
+  if (n->compare != NULL) {
+    return n->compare(key1, key2);
+  }
+  return memcmp(key1, key2, n->key_size);
+}
+
+static
+MapNode* MapNode_find(MapNode* n, MapNode* nil, void* key) {
   MapNode* x = n;
-  while (x != nil && memcmp(key, x->key, key_size) != 0) {
-    if (memcmp(key, x->key, key_size) < 0) {
+  while (x != nil) {
+    int cmp = MapNode_compare(n, key, x->key);
+    if (cmp < 0) {
       x = x->left;
-    } else {
+    } else if (cmp > 0) {
       x = x->right;
+    } else {
+      break;
     }
   }
   return x;
@@ -246,10 +263,11 @@ void Map_deleteFixup(Map* m, MapNode* x) {
   x->color = BLACK;
 }
 
-Map* new_Map(size_t key_size, size_t value_size) {
+Map* new_Map(size_t key_size, size_t value_size, MapCompareFn compare) {
   Map* m = calloc(1, sizeof(Map));
   m->key_size = key_size;
   m->value_size = value_size;
+  m->compare = compare;
   m->NIL = new_MapNodeNIL(key_size, value_size);
   m->root = m->NIL;
   return m;
@@ -263,17 +281,25 @@ void delete_Map(Map* m) {
   free(m);
 }
 
+static
+int Map_compare(Map* m, void* key1, void* key2) {
+  if (m->compare != NULL) {
+    return m->compare(key1, key1);
+  }
+  return memcmp(key1, key2, m->key_size);
+}
+
 void Map_insert(Map* m, void* key, void* value) {
   MapNode* z = new_MapNode(RED, &(MapNodeKV){
       .key_data = key, .key_size = m->key_size,
       .value_data = value, .value_size = m->value_size
-      });
+      }, m->compare);
   MapNode* y = m->NIL; //variable for the parent of the added node
   MapNode* x = m->root;
 
   while(x != m->NIL) {
     y = x;
-    if(memcmp(z->key, x->key, m->key_size) < 0) {
+    if(Map_compare(m, z->key, x->key) < 0) {
       x = x->left;
     } else {
       x = x->right;
@@ -284,7 +310,7 @@ void Map_insert(Map* m, void* key, void* value) {
   if(y == m->NIL) { //newly added node is root
     m->root = z;
   }
-  else if(memcmp(z->key, y->key, m->key_size) < 0) { //value of child is less than its parent, left child
+  else if(Map_compare(m, z->key, y->key) < 0) { //value of child is less than its parent, left child
     y->left = z;
   } else {
     y->right = z;
@@ -297,7 +323,7 @@ void Map_insert(Map* m, void* key, void* value) {
 }
 
 void Map_delete(Map* m, void* key) {
-  MapNode* z = MapNode_find(m->root, m->NIL, key, m->key_size);
+  MapNode* z = MapNode_find(m->root, m->NIL, key);
   if (z == NULL) {
     return;
   }
@@ -340,7 +366,7 @@ void Map_delete(Map* m, void* key) {
 }
 
 void* Map_find(Map* m, void* key) {
-  MapNode* n = MapNode_find(m->root, m->NIL, key, m->key_size);
+  MapNode* n = MapNode_find(m->root, m->NIL, key);
   if (n != m->NIL) {
     return n->value;
   }
