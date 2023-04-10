@@ -6,13 +6,13 @@
 
 struct Heap {
   size_t item_size;
-  HeapCompareFn compare;
+  HeapBiggerFn bigger;
   size_t capacity;
   size_t count;
   void*  items;
 };
 
-Heap* new_Heap(size_t item_size, HeapCompareFn compare, size_t capacity) {
+Heap* new_Heap(size_t item_size, HeapBiggerFn bigger, size_t capacity) {
   Heap* h = calloc(1, sizeof(Heap));
 
   if (capacity == 0) {
@@ -21,7 +21,7 @@ Heap* new_Heap(size_t item_size, HeapCompareFn compare, size_t capacity) {
   }
 
   h->item_size = item_size;
-  h->compare = compare;
+  h->bigger = bigger;
   h->capacity = capacity;
   h->items = calloc(capacity, item_size);
 
@@ -38,8 +38,8 @@ bool Heap_bigger(Heap* h, size_t i, size_t j) {
   char* items = (char*)h->items;
   char* item_i = &items[i * h->item_size];
   char* item_j = &items[j * h->item_size];
-  if (h->compare != NULL) {
-    return h->compare(item_i, item_j) > 0;
+  if (h->bigger != NULL) {
+    return h->bigger(item_i, item_j);
   }
   return memcmp(item_i, item_j, h->item_size) > 0;
 }
