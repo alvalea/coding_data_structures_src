@@ -11,14 +11,16 @@ struct HashMap {
   size_t key_size;
   size_t value_size;
   List** buckets;
+  HashMapEqualFn equal;
 };
 
-HashMap* new_HashMap(size_t key_size, size_t value_size) {
+HashMap* new_HashMap(size_t key_size, size_t value_size, HashMapEqualFn equal) {
   HashMap* m = calloc(1, sizeof(HashMap));
   m->capacity = CAPACITY;
   m->key_size = key_size;
   m->value_size = value_size;
   m->buckets = calloc(m->capacity, sizeof(List*));
+  m->equal = equal;
   return m;
 }
 
@@ -61,13 +63,21 @@ void HashMap_insert(HashMap* m, void* key, void* value) {
   HashMap_insert_item(m, hash, key, value);
 }
 
+static
+bool HashMap_equal(HashMap* m, void* key1, void* key2) {
+  if (m->equal != NULL) {
+    return m->equal(key1, key2);
+  }
+  return memcmp(key1, key2, m->key_size) == 0;
+}
+
 void HashMap_delete(HashMap* m, void* key) {
   int hash = HashMap_hash(m, key);
   if (m->buckets[hash] != NULL) {
     ListNode* n = List_head(m->buckets[hash]);
     while (n) {
       void* item = ListNode_data(n);
-      if (memcmp(item, key, m->key_size) == 0) {
+      if (HashMap_equal(m, item, key)) {
         List_remove(m->buckets[hash], item);
         return;
       }
@@ -81,7 +91,7 @@ void* HashMap_find(HashMap* m, void* key) {
     ListNode* n = List_head(m->buckets[hash]);
     while (n) {
       void* item = ListNode_data(n);
-      if (memcmp(item, key, m->key_size) == 0) {
+      if (HashMap_equal(m, item, key)) {
         return (char*)item + m->key_size;
       }
     }

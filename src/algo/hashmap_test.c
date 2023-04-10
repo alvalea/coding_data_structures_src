@@ -3,9 +3,16 @@
 #include <stdlib.h>
 #include <algo/container.h>
 
+static
+bool test_HashMap_equal(void* key1, void* key2) {
+  int* k1 = (int*)key1;
+  int* k2 = (int*)key2;
+  return *k1 == *k2;
+}
+
 int test_HashMap_insert() {
   int result = 0;
-  HashMap* m = new_HashMap(sizeof(int), sizeof(int));
+  HashMap* m = new_HashMap(sizeof(int), sizeof(int), test_HashMap_equal);
   {
     int i = 3;
     HashMap_insert(m, &i, &i);
@@ -20,7 +27,7 @@ int test_HashMap_insert() {
 
 int test_HashMap_delete() {
   int result = 0;
-  HashMap* m = new_HashMap(sizeof(int), sizeof(int));
+  HashMap* m = new_HashMap(sizeof(int), sizeof(int), test_HashMap_equal);
   {
     int i = 3;
     HashMap_insert(m, &i, &i);
@@ -36,7 +43,7 @@ int test_HashMap_delete() {
 
 int test_HashMap_find() {
   int result = 0;
-  HashMap* m = new_HashMap(sizeof(int), sizeof(int));
+  HashMap* m = new_HashMap(sizeof(int), sizeof(int), test_HashMap_equal);
   {
     int i = 3;
     HashMap_insert(m, &i, &i);
