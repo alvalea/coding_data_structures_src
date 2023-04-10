@@ -70,13 +70,14 @@ void* HashMap_find(HashMap* m, void* key);
 
 typedef struct Heap Heap;
 
-Heap* new_Heap(size_t key_size, size_t value_size, size_t capacity);
+typedef int (*HeapCompareFn)(void* item1, void* item2);
+Heap* new_Heap(size_t item_size, HeapCompareFn compare, size_t capacity);
 void delete_Heap(Heap* h);
 
-bool Heap_push(Heap* h, void* key, void* value);
-bool Heap_pop(Heap* h, void* value);
+bool Heap_push(Heap* h, void* item);
+bool Heap_pop(Heap* h, void* item);
 
-typedef void (*HeapPrintFn)(void* value);
+typedef void (*HeapPrintFn)(void* item);
 void Heap_print(Heap* h, HeapPrintFn print);
 
 #endif

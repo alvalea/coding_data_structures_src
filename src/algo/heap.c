@@ -5,14 +5,14 @@
 #include <string.h>
 
 struct Heap {
-  size_t key_size;
-  size_t value_size;
+  size_t item_size;
+  HeapCompareFn compare;
   size_t capacity;
   size_t count;
   void*  items;
 };
 
-Heap* new_Heap(size_t key_size, size_t value_size, size_t capacity) {
+Heap* new_Heap(size_t item_size, HeapCompareFn compare, size_t capacity) {
   Heap* h = calloc(1, sizeof(Heap));
 
   if (capacity == 0) {
@@ -20,10 +20,10 @@ Heap* new_Heap(size_t key_size, size_t value_size, size_t capacity) {
     exit(1);
   }
 
-  h->key_size = key_size;
-  h->value_size = value_size;
+  h->item_size = item_size;
+  h->compare = compare;
   h->capacity = capacity;
-  h->items = calloc(capacity, key_size + value_size);
+  h->items = calloc(capacity, item_size);
 
   return h;
 }
@@ -35,25 +35,26 @@ void delete_Heap(Heap* h) {
 
 static
 bool Heap_bigger(Heap* h, size_t i, size_t j) {
-  size_t item_size = h->key_size + h->value_size;
   char* items = (char*)h->items;
-  char* item_i = &items[i * item_size];
-  char* item_j = &items[j * item_size];
-  return memcmp(item_i, item_j, h->key_size) > 0;
+  char* item_i = &items[i * h->item_size];
+  char* item_j = &items[j * h->item_size];
+  if (h->compare != NULL) {
+    return h->compare(item_i, item_j) > 0;
+  }
+  return memcmp(item_i, item_j, h->item_size) > 0;
 }
 
 static
 void Heap_swap(Heap* h, size_t i, size_t j) {
-  size_t item_size = h->key_size + h->value_size;
   char* items = (char*)h->items;
-  char* item_i = &items[i * item_size];
-  char* item_j = &items[j * item_size];
+  char* item_i = &items[i * h->item_size];
+  char* item_j = &items[j * h->item_size];
 
-  char* tmp = calloc(1, item_size);
+  char* tmp = calloc(1, h->item_size);
   {
-    memcpy(tmp, item_j, item_size);
-    memcpy(item_j, item_i, item_size);
-    memcpy(item_i, tmp, item_size);
+    memcpy(tmp, item_j, h->item_size);
+    memcpy(item_j, item_i, h->item_size);
+    memcpy(item_i, tmp, h->item_size);
   }
   free(tmp);
 }
@@ -85,16 +86,14 @@ void Heap_sort(Heap* h) {
   }
 }
 
-bool Heap_push(Heap* h, void* key, void* value) {
+bool Heap_push(Heap* h, void* item) {
   if (h->count == h->capacity) {
     return false;
   }
   char* items = (char*)h->items;
   size_t index = h->count;
-  size_t item_size = h->key_size + h->value_size;
-  char* dst = &items[index * item_size];
-  memcpy(dst, key, h->key_size);
-  memcpy(dst + h->key_size, value, h->value_size);
+  char* dst = &items[index * h->item_size];
+  memcpy(dst, item, h->item_size);
 
   h->count++;
   Heap_sort(h);
@@ -102,13 +101,12 @@ bool Heap_push(Heap* h, void* key, void* value) {
   return true;
 }
 
-bool Heap_pop(Heap* h, void* value) {
+bool Heap_pop(Heap* h, void* item) {
   if (h->count == 0) {
     return false;
   }
-  char* items = (char*)h->items;
-  char* src = items + h->key_size;
-  memcpy(value, src, h->value_size);
+  char* src = (char*)h->items;
+  memcpy(item, src, h->item_size);
 
   Heap_swap(h, 0, h->count-1);
 
@@ -121,8 +119,7 @@ bool Heap_pop(Heap* h, void* value) {
 void Heap_print(Heap* h, HeapPrintFn print) {
   for (size_t i=0; i<h->count; ++i) {
     char* items = (char*)h->items;
-    size_t item_size = h->key_size + h->value_size;
-    char* value = &items[i * item_size] + h->key_size;
-    print(value);
+    char* item = &items[i * h->item_size];
+    print(item);
   }
 }
