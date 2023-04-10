@@ -12,7 +12,7 @@ struct Heap {
   void*  items;
 };
 
-Heap* new_Heap(size_t item_size, HeapBiggerFn bigger, size_t capacity) {
+Heap* new_Heap(size_t item_size, size_t capacity, HeapBiggerFn bigger) {
   Heap* h = calloc(1, sizeof(Heap));
 
   if (capacity == 0) {
@@ -21,8 +21,8 @@ Heap* new_Heap(size_t item_size, HeapBiggerFn bigger, size_t capacity) {
   }
 
   h->item_size = item_size;
-  h->bigger = bigger;
   h->capacity = capacity;
+  h->bigger = bigger;
   h->items = calloc(capacity, item_size);
 
   return h;

@@ -73,7 +73,7 @@ void* HashMap_find(HashMap* m, void* key);
 typedef struct Heap Heap;
 
 typedef bool (*HeapBiggerFn)(void* item1, void* item2);
-Heap* new_Heap(size_t item_size, HeapBiggerFn bigger, size_t capacity);
+Heap* new_Heap(size_t item_size, size_t capacity, HeapBiggerFn bigger);
 void delete_Heap(Heap* h);
 
 bool Heap_push(Heap* h, void* item);

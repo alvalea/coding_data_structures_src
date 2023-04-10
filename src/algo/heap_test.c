@@ -31,7 +31,7 @@ bool test_Heap_bigger_string(void* item1, void* item2) {
 int test_Heap_push() {
   int result = 0;
   int n = 10;
-  Heap* h = new_Heap(sizeof(int), test_Heap_bigger_int, n);
+  Heap* h = new_Heap(sizeof(int), n, test_Heap_bigger_int);
   {
     for (int i = 1; i<=n; ++i) {
       Heap_push(h, &i);
@@ -52,7 +52,7 @@ int test_Heap_pop() {
   int result = 0;
   string str;
   int n = 10;
-  Heap* h = new_Heap(sizeof(string), test_Heap_bigger_string, n);
+  Heap* h = new_Heap(sizeof(string), n, test_Heap_bigger_string);
   {
     for (int i = 1; i<=n; ++i) {
       _itoa_s(i, str, STR, 10);
