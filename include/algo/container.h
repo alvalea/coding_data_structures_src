@@ -68,6 +68,9 @@ void HashMap_insert(HashMap* m, void* key, void* value);
 void HashMap_delete(HashMap* m, void* key);
 void* HashMap_find(HashMap* m, void* key);
 
+typedef void (*HashMapPrintFn)(void* value);
+void HashMap_print(HashMap* m, HashMapPrintFn print);
+
 //========================================================
 
 typedef struct Heap Heap;
@@ -81,5 +84,17 @@ bool Heap_pop(Heap* h, void* item);
 
 typedef void (*HeapPrintFn)(void* item);
 void Heap_print(Heap* h, HeapPrintFn print);
+
+//========================================================
+
+typedef struct BTree BTree;
+
+BTree* new_BTree();
+void delete_BTree(BTree* t);
+
+void BTree_insert(BTree* t, int value);
+
+typedef void (*BTreePrintFn)(void* value);
+void BTree_print(BTree* h, BTreePrintFn print);
 
 #endif

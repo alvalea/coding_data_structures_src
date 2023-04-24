@@ -1,5 +1,6 @@
 #include <algo/container.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -81,6 +82,7 @@ void HashMap_delete(HashMap* m, void* key) {
         List_remove(m->buckets[hash], item);
         return;
       }
+      n = ListNode_next(n);
     }
   }
 }
@@ -94,7 +96,24 @@ void* HashMap_find(HashMap* m, void* key) {
       if (HashMap_equal(m, item, key)) {
         return (char*)item + m->key_size;
       }
+      n = ListNode_next(n);
     }
   }
   return NULL;
+}
+
+void HashMap_print(HashMap* m, HashMapPrintFn print) {
+  for (int i=0; i<m->capacity; ++i) {
+    if (m->buckets[i] != NULL) {
+      printf("[%d] ", i);
+      ListNode* n = List_head(m->buckets[i]);
+      while (n) {
+        void* item = ListNode_data(n);
+        print(item);
+        printf(" -> ");
+        n = ListNode_next(n);
+      }
+      printf("\n");
+    }
+  }
 }

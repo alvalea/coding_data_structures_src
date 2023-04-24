@@ -130,6 +130,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\algo\btree.c" />
+    <ClCompile Include="src\algo\btree_test.c" />
     <ClCompile Include="src\algo\container.c" />
     <ClCompile Include="src\algo\container_test.c" />
     <ClCompile Include="src\algo\hashmap.c" />

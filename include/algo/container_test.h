@@ -26,4 +26,6 @@ int test_HashMap_find();
 int test_Heap_push();
 int test_Heap_pop();
 
+int test_BTree_insert();
+
 #endif

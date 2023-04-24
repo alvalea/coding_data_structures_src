@@ -170,4 +170,3 @@ int test_Queue_pop() {
   delete_Queue(q);
   return result;
 }
-

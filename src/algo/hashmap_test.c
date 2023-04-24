@@ -45,8 +45,10 @@ int test_HashMap_find() {
   int result = 0;
   HashMap* m = new_HashMap(sizeof(int), sizeof(int), test_HashMap_equal);
   {
-    int i = 3;
-    HashMap_insert(m, &i, &i);
+    for (int i=0; i<100; ++i) {
+      HashMap_insert(m, &i, &i);
+    }
+    int i = 99;
     int* x = HashMap_find(m, &i);
     if (*x != i){
       result = -1;

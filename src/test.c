@@ -45,6 +45,8 @@ void test_main() {
   test("test_Heap_push", test_Heap_push);
   test("test_Heap_pop", test_Heap_pop);
 
+  test("test_BTree_insert", test_BTree_insert);
+
   test("test_quicksort", test_quicksort);
 }
 
