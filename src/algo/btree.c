@@ -29,7 +29,7 @@ BTreeNode* new_BTreeNode(BTreeNode* parent, BTreeNode* child, int item){
 
 static
 void delete_BTreeNode(BTreeNode* n) {
-  for (int i = 0; i < n->count+1 && i < MAX + 1; ++i) {
+  for (int i = 0; i <= n->count; ++i) {
     if (n->link[i] != NULL) {
       delete_BTreeNode(n->link[i]);
     }
