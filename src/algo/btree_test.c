@@ -11,7 +11,7 @@ void test_BTree_print(void* value) {
 
 int test_BTree_insert() {
   int result = 0;
-  BTree* t = new_BTree();
+  BTree* t = new_BTree(2);
   {
     for (int i=1; i<=50; ++i) {
       BTree_insert(t, i);

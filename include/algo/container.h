@@ -89,12 +89,13 @@ void Heap_print(Heap* h, HeapPrintFn print);
 
 typedef struct BTree BTree;
 
-BTree* new_BTree();
+BTree* new_BTree(int min_degree);
 void delete_BTree(BTree* t);
 
 void BTree_insert(BTree* t, int value);
+void BTree_delete(BTree* t, int value);
 
 typedef void (*BTreePrintFn)(void* value);
-void BTree_print(BTree* h, BTreePrintFn print);
+void BTree_print(BTree* t, BTreePrintFn print);
 
 #endif
