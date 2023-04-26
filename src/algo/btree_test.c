@@ -13,9 +13,12 @@ int test_BTree_insert() {
   int result = 0;
   BTree* t = new_BTree(2);
   {
-    for (int i=1; i<=50; ++i) {
+    for (int i=1; i<=10; ++i) {
       BTree_insert(t, i);
     }
+    printf("\n");
+    BTree_print(t, test_BTree_print);
+    BTree_delete(t, 3);
     printf("\n");
     BTree_print(t, test_BTree_print);
   }
