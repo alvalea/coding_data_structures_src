@@ -39,6 +39,13 @@ void delete_BTreeNode(BTreeNode* n) {
 }
 
 static
+void free_BTreeNode(BTreeNode* n) {
+	free(n->items);
+	free(n->c);
+	free(n);
+}
+
+static
 bool BTreeNode_empty(BTreeNode* n) {
   return n->count == 0;
 }
@@ -193,7 +200,7 @@ void BTreeNode_merge(BTreeNode* n, int idx) {
 
 	// Copying the items from c[idx+1] to c[idx] at the end
 	for (int i = 0; i < sibling->count; ++i)
-		child->items[i + n->count] = sibling->items[i];
+		child->items[i + n->min] = sibling->items[i];
 
 	// Copying the child pointers from c[idx+1] to c[idx]
 	if (!child->leaf)
@@ -217,7 +224,7 @@ void BTreeNode_merge(BTreeNode* n, int idx) {
 	n->count--;
 
 	// Freeing the memory occupied by sibling
-	delete_BTreeNode(sibling);
+	free_BTreeNode(sibling);
 }
 
 // Forward declaration
