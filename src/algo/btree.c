@@ -499,7 +499,7 @@ void BTree_insert(BTree* t, int value) {
 	}
 }
 
-void BTree_delete(BTree* t, int value) {
+void BTree_remove(BTree* t, int value) {
   if (t->root == NULL) {
 		printf("The tree is empty\n");
 		return;

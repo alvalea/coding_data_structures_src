@@ -72,7 +72,7 @@ bool HashMap_equal(HashMap* m, void* key1, void* key2) {
   return memcmp(key1, key2, m->key_size) == 0;
 }
 
-void HashMap_delete(HashMap* m, void* key) {
+void HashMap_remove(HashMap* m, void* key) {
   int hash = HashMap_hash(m, key);
   if (m->buckets[hash] != NULL) {
     ListNode* n = List_head(m->buckets[hash]);

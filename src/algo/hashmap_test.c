@@ -25,13 +25,13 @@ int test_HashMap_insert() {
   return result;
 }
 
-int test_HashMap_delete() {
+int test_HashMap_remove() {
   int result = 0;
   HashMap* m = new_HashMap(sizeof(int), sizeof(int), test_HashMap_equal);
   {
     int i = 3;
     HashMap_insert(m, &i, &i);
-    HashMap_delete(m, &i);
+    HashMap_remove(m, &i);
     int* x = HashMap_find(m, &i);
     if (x != NULL){
       result = -1;

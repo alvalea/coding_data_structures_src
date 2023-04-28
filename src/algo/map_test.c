@@ -44,7 +44,7 @@ int test_Map_insert() {
   return result;
 }
 
-int test_Map_delete() {
+int test_Map_remove() {
   int result = 0;
   Map* m = new_Map(sizeof(string), sizeof(int), test_Map_compare);
   {
@@ -52,7 +52,7 @@ int test_Map_delete() {
     string str;
     _itoa_s(i, str, STR, 10);
     Map_insert(m, str, &i);
-    Map_delete(m, str);
+    Map_remove(m, str);
     if (Map_find(m, str) != NULL) {
       result = -1;
     }

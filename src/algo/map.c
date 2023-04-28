@@ -205,7 +205,7 @@ MapNode* Map_minimum(Map* m, MapNode* x) {
 }
 
 static
-void Map_deleteFixup(Map* m, MapNode* x) {
+void Map_removeFixup(Map* m, MapNode* x) {
   while(x != m->root && x->color == BLACK) {
     if(x == x->parent->left) {
       MapNode* w = x->parent->right;
@@ -322,7 +322,7 @@ void Map_insert(Map* m, void* key, void* value) {
   Map_insertFixup(m, z);
 }
 
-void Map_delete(Map* m, void* key) {
+void Map_remove(Map* m, void* key) {
   MapNode* z = MapNode_find(m->root, m->NIL, key);
   if (z == NULL) {
     return;
@@ -357,7 +357,7 @@ void Map_delete(Map* m, void* key) {
     y->color = z->color;
   }
   if(y_orignal_color == BLACK) {
-    Map_deleteFixup(m, x);
+    Map_removeFixup(m, x);
   }
 
   z->left = NULL;

@@ -16,11 +16,11 @@ int test_Queue_push();
 int test_Queue_pop();
 
 int test_Map_insert();
-int test_Map_delete();
+int test_Map_remove();
 int test_Map_find();
 
 int test_HashMap_insert();
-int test_HashMap_delete();
+int test_HashMap_remove();
 int test_HashMap_find();
 
 int test_Heap_push();

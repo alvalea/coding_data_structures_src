@@ -18,7 +18,7 @@ int test_BTree_insert() {
     }
     printf("\n");
     BTree_print(t, test_BTree_print);
-    BTree_delete(t, 3);
+    BTree_remove(t, 3);
     printf("\n");
     BTree_print(t, test_BTree_print);
   }

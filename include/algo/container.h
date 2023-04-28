@@ -50,7 +50,7 @@ Map* new_Map(size_t key_size, size_t value_size, MapCompareFn compare);
 void delete_Map(Map* m);
 
 void Map_insert(Map* m, void* key, void* value);
-void Map_delete(Map* m, void* key);
+void Map_remove(Map* m, void* key);
 void* Map_find(Map* m, void* key);
 
 typedef void (*MapPrintFn)(void* value);
@@ -65,7 +65,7 @@ HashMap* new_HashMap(size_t key_size, size_t value_size, HashMapEqualFn equal);
 void delete_HashMap(HashMap* m);
 
 void HashMap_insert(HashMap* m, void* key, void* value);
-void HashMap_delete(HashMap* m, void* key);
+void HashMap_remove(HashMap* m, void* key);
 void* HashMap_find(HashMap* m, void* key);
 
 typedef void (*HashMapPrintFn)(void* value);
@@ -93,7 +93,7 @@ BTree* new_BTree(int min_degree);
 void delete_BTree(BTree* t);
 
 void BTree_insert(BTree* t, int value);
-void BTree_delete(BTree* t, int value);
+void BTree_remove(BTree* t, int value);
 
 typedef void (*BTreePrintFn)(void* value);
 void BTree_print(BTree* t, BTreePrintFn print);
