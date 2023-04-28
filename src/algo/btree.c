@@ -39,7 +39,7 @@ void delete_BTreeNode(BTreeNode* n) {
 }
 
 static
-void free_BTreeNode(BTreeNode* n) {
+void BTreeNode_free(BTreeNode* n) {
 	free(n->items);
 	free(n->c);
 	free(n);
@@ -224,7 +224,7 @@ void BTreeNode_merge(BTreeNode* n, int idx) {
 	n->count--;
 
 	// Freeing the memory occupied by sibling
-	free_BTreeNode(sibling);
+	BTreeNode_free(sibling);
 }
 
 // Forward declaration
