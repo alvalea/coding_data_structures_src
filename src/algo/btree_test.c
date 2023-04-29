@@ -11,17 +11,24 @@ void test_BTree_print(void* value) {
 
 int test_BTree_insert() {
   int result = 0;
-  BTree* t = new_BTree(2);
-  {
-    for (int i=1; i<=50; ++i) {
-      BTree_insert(t, i);
+
+  for (int i=2; i<6; ++i) {
+    BTree* t = new_BTree(i);
+    {
+      for (int j=1; j<=50; ++j) {
+        BTree_insert(t, j);
+      }
+      printf("\n");
+      BTree_print(t, test_BTree_print);
+      for (int k=1; k<=50; ++k) {
+        if (k%3== 0) {
+          BTree_remove(t, k);
+        }
+      }
+      printf("\n");
+      BTree_print(t, test_BTree_print);
     }
-    printf("\n");
-    BTree_print(t, test_BTree_print);
-    BTree_remove(t, 3);
-    printf("\n");
-    BTree_print(t, test_BTree_print);
+    delete_BTree(t);
   }
-  delete_BTree(t);
   return result;
 }

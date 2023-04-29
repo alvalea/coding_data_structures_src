@@ -66,14 +66,12 @@ void BTreeNode_split_child(BTreeNode* n, int i, BTreeNode* y)
 	z->count = n->min - 1;
 
 	// Copy the last (min-1) min of y to z
-	for (int j = 0; j < n->min - 1; j++)
-		z->items[j] = y->items[j + n->min];
+  memmove(&z->items[0], &y->items[n->min], sizeof(int) * (n->min - 1));
 
 	// Copy the last min children of y to z
 	if (!y->leaf)
 	{
-		for (int j = 0; j < n->min; j++)
-			z->c[j] = y->c[j + n->min];
+    memmove(&z->c[0], &y->c[n->min], sizeof(BTreeNode*) * n->min);
 	}
 
 	// Reduce the number of items in y
@@ -81,16 +79,14 @@ void BTreeNode_split_child(BTreeNode* n, int i, BTreeNode* y)
 
 	// Since this node is going to have a new child,
 	// create space of new child
-	for (int j = n->count; j >= i + 1; j--)
-		n->c[j + 1] = n->c[j];
+  memmove(&n->c[i + 2], &n->c[i + 1], sizeof(BTreeNode*) * (n->count - i));
 
 	// Link the new child to this node
 	n->c[i + 1] = z;
 
 	// A key of y will move to this node. Find location of
 	// new key and move all greater keys one space ahead
-	for (int j = n->count - 1; j >= i; j--)
-		n->items[j + 1] = n->items[j];
+  memmove(&n->items[i+1], &n->items[i], sizeof(int) * (n->count - i));
 
 	// Copy the middle key of y to this node
 	n->items[i] = y->items[n->min - 1];
@@ -156,8 +152,7 @@ int BTreeNode_find_index(BTreeNode* n, int value) {
 static
 void BTreeNode_remove_from_leaf(BTreeNode* n, int idx) {
   // Move all the keys after the idx-th pos one place backward
-	for (int i = idx + 1; i < n->count; ++i)
-		n->items[i - 1] = n->items[i];
+  memmove(&n->items[idx], &n->items[idx+1], sizeof(int) * (n->count - (idx + 1)));
 
 	// Reduce the count of keys
 	n->count--;
@@ -199,25 +194,21 @@ void BTreeNode_merge(BTreeNode* n, int idx) {
 	child->items[n->min - 1] = n->items[idx];
 
 	// Copying the items from c[idx+1] to c[idx] at the end
-	for (int i = 0; i < sibling->count; ++i)
-		child->items[i + n->min] = sibling->items[i];
+  memmove(&child->items[n->min], &sibling->items[0], sizeof(int) * (sibling->count));
 
 	// Copying the child pointers from c[idx+1] to c[idx]
 	if (!child->leaf)
 	{
-		for (int i = 0; i <= sibling->count; ++i)
-			child->c[i + n->min] = sibling->c[i];
+    memmove(&child->c[n->min], &sibling->c[0], sizeof(BTreeNode*) * (sibling->count + 1));
 	}
 
 	// Moving all items after idx in the current node one step before -
 	// to fill the gap created by moving items[idx] to c[idx]
-	for (int i = idx + 1; i < n->count; ++i)
-		n->items[i - 1] = n->items[i];
+  memmove(&n->items[idx], &n->items[idx+1], sizeof(int) * (n->count - (idx + 1)));
 
 	// Moving the child pointers after (idx+1) in the current node one
 	// step before
-	for (int i = idx + 2; i <= n->count; ++i)
-		n->c[i - 1] = n->c[i];
+  memmove(&n->c[idx + 1], &n->c[idx + 2], sizeof(BTreeNode*) * ((n->count + 1) - (idx + 2)));
 
 	// Updating the key count of child and the current node
 	child->count += sibling->count + 1;
@@ -283,14 +274,12 @@ void BTreeNode_borrow_from_prev(BTreeNode* n, int idx)
 	// sibling one item and child gains one item
 
 	// Moving all items in c[idx] one step ahead
-	for (int i = child->count - 1; i >= 0; --i)
-		child->items[i + 1] = child->items[i];
+  memmove(&child->items[1], &child->items[0], sizeof(int) * child->count);
 
 	// If c[idx] is not a leaf, move all its child pointers one step ahead
 	if (!child->leaf)
 	{
-		for (int i = child->count; i >= 0; --i)
-			child->c[i + 1] = child->c[i];
+		memmove(&child->c[1], &child->c[0], sizeof(BTreeNode*) * (n->count + 1));
 	}
 
 	// Setting child's first item equal to items[idx-1] from the current node
@@ -328,14 +317,12 @@ void BTreeNode_borrow_from_next(BTreeNode* n, int idx)
 	n->items[idx] = sibling->items[0];
 
 	// Moving all items in sibling one step behind
-	for (int i = 1; i < sibling->count; ++i)
-		sibling->items[i - 1] = sibling->items[i];
+  memmove(&sibling->items[0], &sibling->items[1], sizeof(int) * (sibling->count - 1));
 
 	// Moving the child pointers one step behind
 	if (!sibling->leaf)
 	{
-		for (int i = 1; i <= sibling->count; ++i)
-			sibling->c[i - 1] = sibling->c[i];
+    memmove(&sibling->c[0], &sibling->c[1], sizeof(BTreeNode*) * sibling->count);
 	}
 
 	// Increasing and decreasing the item count of c[idx] and c[idx+1]
