@@ -279,7 +279,7 @@ void BTreeNode_borrow_from_prev(BTreeNode* n, int idx)
 	// If c[idx] is not a leaf, move all its child pointers one step ahead
 	if (!child->leaf)
 	{
-		memmove(&child->c[1], &child->c[0], sizeof(BTreeNode*) * (n->count + 1));
+		memmove(&child->c[1], &child->c[0], sizeof(BTreeNode*) * (child->count + 1));
 	}
 
 	// Setting child's first item equal to items[idx-1] from the current node
@@ -505,7 +505,7 @@ void BTree_remove(BTree* t, int value) {
 			t->root = t->root->c[0];
 
 		// Free the old root
-		delete_BTreeNode(tmp);
+		BTreeNode_free(tmp);
 	}
 }
 
