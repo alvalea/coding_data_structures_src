@@ -18,17 +18,35 @@ int test_BTree_insert() {
       for (int j=1; j<=50; ++j) {
         BTree_insert(t, j);
       }
-      printf("\n");
-      BTree_print(t, test_BTree_print);
-      for (int k=1; k<=50; ++k) {
-        if (k%3== 0) {
-          BTree_remove(t, k);
+      for (int j=1; j<=50; ++j) {
+        if (j%3== 0) {
+          BTree_remove(t, j);
         }
       }
-      printf("\n");
-      BTree_print(t, test_BTree_print);
     }
     delete_BTree(t);
   }
+  return result;
+}
+
+int test_BTree_find() {
+  int result = 0;
+  BTree* t = new_BTree(5);
+  {
+    for (int j=1; j<=50; ++j) {
+      BTree_insert(t, j);
+    }
+    for (int j=1; j<=50; ++j) {
+      if (j%3== 0) {
+        BTree_remove(t, j);
+      }
+    }
+
+    int x = BTree_find(t, 22);
+    if (x != 22) {
+      result = -1;
+    }
+  }
+  delete_BTree(t);
   return result;
 }

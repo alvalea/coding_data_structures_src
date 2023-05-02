@@ -94,6 +94,7 @@ void delete_BTree(BTree* t);
 
 void BTree_insert(BTree* t, int value);
 void BTree_remove(BTree* t, int value);
+int BTree_find(BTree* t, int value);
 
 typedef void (*BTreePrintFn)(void* value);
 void BTree_print(BTree* t, BTreePrintFn print);

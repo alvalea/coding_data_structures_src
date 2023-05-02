@@ -401,6 +401,27 @@ void BTreeNode_remove(BTreeNode* n, int value) {
 }
 
 static
+int BTreeNode_find(BTreeNode* n, int value) {
+  // Find the first key greater than or equal to value
+  int i = 0;
+  while (i < n->count && value > n->items[i])
+    i++;
+
+  // If the found item is equal to value, return this node
+  if (n->items[i] == value)
+    return n->items[i];
+
+  // If item is not found here and this is a leaf node
+  if (n->leaf) {
+    printf("Cannot find value: %d\n", value);
+    return -1;
+  }
+
+  // Go to the appropriate child
+  return BTreeNode_find(n->c[i], value);
+}
+
+static
 void BTreeNode_print_page(BTreeNode* n, int child, string str, BTreePrintFn print) {
   strcat_s(str, STR, "     ");
   for (int j = 1; j <= child; ++j) {
@@ -507,6 +528,14 @@ void BTree_remove(BTree* t, int value) {
 		// Free the old root
 		BTreeNode_free(tmp);
 	}
+}
+
+int BTree_find(BTree* t, int value) {
+  if (t->root == NULL) {
+    printf("Cannot find value: %d\n", value);
+    return -1;
+  }
+  return BTreeNode_find(t->root, value);
 }
 
 void BTree_print(BTree* t, BTreePrintFn print) {

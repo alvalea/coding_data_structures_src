@@ -27,5 +27,6 @@ int test_Heap_push();
 int test_Heap_pop();
 
 int test_BTree_insert();
+int test_BTree_find();
 
 #endif
