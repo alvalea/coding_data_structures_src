@@ -9,9 +9,13 @@ Array* new_Array(size_t item_size, size_t initial_capacity);
 void delete_Array(Array* a);
 
 size_t Array_add(Array* a, void* item);
+void Array_remove(Array* a, size_t index);
 void* Array_get(Array* a, size_t index);
 size_t Array_len(Array* a);
 void  Array_clear(Array* a);
+
+typedef void (*ArrayPrintFn)(void* value);
+void Array_print(Array* a, ArrayPrintFn print);
 
 //========================================================
 

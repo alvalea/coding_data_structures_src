@@ -49,10 +49,22 @@ size_t Array_add(Array* a, void* item) {
   return index;
 }
 
+void Array_remove(Array* a, size_t index) {
+  if (index >= a->len) {
+    printf("Index out of bounds: len %zu, index %zu\n", a->len, index);
+    return;
+  }
+  size_t n = a->len - 1 - index;
+  char* dst = (char*)a->items + (index * a->item_size);
+  char* src = (char*)a->items + ((index + 1) * a->item_size);
+  memmove(dst, src, a->item_size * n);
+  a->len--;
+}
+
 void* Array_get(Array* a, size_t index) {
   if (index >= a->len) {
     printf("Index out of bounds: len %zu, index %zu\n", a->len, index);
-    exit(1);
+    return NULL;
   }
   size_t offset = index * a->item_size;
   char* item = (char*)a->items + offset;
@@ -65,6 +77,13 @@ size_t Array_len(Array* a) {
 
 void  Array_clear(Array* a) {
   a->len = 0;
+}
+
+void Array_print(Array* a, ArrayPrintFn print) {
+  size_t len = Array_len(a);
+  for (size_t i=0; i<len; ++i) {
+    print(Array_get(a, i));
+  }
 }
 
 //========================================================

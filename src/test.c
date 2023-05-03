@@ -21,6 +21,7 @@ void test(const char* test_name, test_fn fn) {
 static
 void test_main() {
   test("test_Array_add", test_Array_add);
+  test("test_Array_remove", test_Array_remove);
   test("test_Array_get", test_Array_get);
   test("test_Array_len", test_Array_len);
   test("test_Array_clear", test_Array_clear);

@@ -2,6 +2,7 @@
 #define __ALGO_CONTAINER_TEST__
 
 int test_Array_add();
+int test_Array_remove();
 int test_Array_get();
 int test_Array_len();
 int test_Array_clear();
