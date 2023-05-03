@@ -144,6 +144,18 @@ void* List_add(List* l, void* item) {
   return n->data;
 }
 
+static
+ListNode* List_find(List* l, void* item) {
+  ListNode* n = l->head;
+  while(n) {
+    if (memcmp(n->data, item, l->item_size) == 0) {
+      return n;
+    }
+    n = n->next;
+  }
+  return NULL;
+}
+
 void List_remove(List* l, void* item) {
   ListNode* node = List_find(l, item);
   ListNode* n = l->head;
@@ -172,15 +184,12 @@ ListNode* List_tail(List* l) {
   return l->tail;
 }
 
-ListNode* List_find(List* l, void* item) {
+void List_print(List* l, ListPrintFn print) {
   ListNode* n = l->head;
   while(n) {
-    if (memcmp(n->data, item, l->item_size) == 0) {
-      return n;
-    }
+    print(n->data);
     n = n->next;
   }
-  return NULL;
 }
 
 //========================================================

@@ -30,7 +30,6 @@ void test_main() {
   test("test_List_remove", test_List_remove);
   test("test_List_head", test_List_head);
   test("test_List_tail", test_List_tail);
-  test("test_List_find", test_List_find);
 
   test("test_Queue_push", test_Queue_push);
   test("test_Queue_pop", test_Queue_pop);

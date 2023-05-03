@@ -14,7 +14,7 @@ void* Array_get(Array* a, size_t index);
 size_t Array_len(Array* a);
 void  Array_clear(Array* a);
 
-typedef void (*ArrayPrintFn)(void* value);
+typedef void (*ArrayPrintFn)(void* item);
 void Array_print(Array* a, ArrayPrintFn print);
 
 //========================================================
@@ -33,7 +33,9 @@ void* List_add(List* l, void* item);
 void List_remove(List* l, void* item);
 ListNode* List_head(List* l);
 ListNode* List_tail(List* l);
-ListNode* List_find(List* l, void* item);
+
+typedef void (*ListPrintFn)(void* item);
+void List_print(List* l, ListPrintFn print);
 
 //========================================================
 

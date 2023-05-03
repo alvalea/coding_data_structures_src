@@ -4,17 +4,22 @@
 #include <algo/container.h>
 
 static
-void test_Array_print(void* value) {
-  int* v = (int*)value;
-  printf("%d ", *v);
+void test_Array_print(void* item) {
+  int* i = (int*)item;
+  printf("%d ", *i);
+}
+
+static
+void test_List_print(void* item) {
+  int* i = (int*)item;
+  printf("%d ", *i);
 }
 
 int test_Array_add() {
   int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
-    int i = 3;
-    Array_add(a, &i);
+    Array_add(a, &(int){3});
     if (Array_len(a) != 1) {
       result = -1;
     }
@@ -62,8 +67,7 @@ int test_Array_len() {
   int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
-    int i = 3;
-    Array_add(a, &i);
+    Array_add(a, &(int){3});
     if (Array_len(a) != 1) {
       result = -1;
     }
@@ -76,8 +80,7 @@ int test_Array_clear() {
   int result = 0;
   Array* a = new_Array(sizeof(int), 10);
   {
-    int i = 3;
-    Array_add(a, &i);
+    Array_add(a, &(int){3});
     Array_clear(a);
     if (Array_len(a) != 0) {
       result = -1;
@@ -105,8 +108,7 @@ int test_List_remove() {
   int result = 0;
   List* l = new_List(sizeof(int));
   {
-    int i = 3;
-    int* x = List_add(l, &i);
+    int* x = List_add(l, &(int){3});
     List_remove(l, x);
     if (List_head(l) != NULL) {
       result = -1;
@@ -120,8 +122,7 @@ int test_List_head() {
   int result = 0;
   List* l = new_List(sizeof(int));
   {
-    int i = 3;
-    int* x = List_add(l, &i);
+    int* x = List_add(l, &(int){3});
     ListNode* head = List_head(l);
     if (ListNode_data(head) != x) {
       result = -1;
@@ -135,25 +136,9 @@ int test_List_tail() {
   int result = 0;
   List* l = new_List(sizeof(int));
   {
-    int i = 3;
-    int* x = List_add(l, &i);
+    int* x = List_add(l, &(int){3});
     ListNode* tail = List_tail(l);
     if (ListNode_data(tail) != x) {
-      result = -1;
-    }
-  }
-  delete_List(l);
-  return result;
-}
-
-int test_List_find() {
-  int result = 0;
-  List* l = new_List(sizeof(int));
-  {
-    int i = 3;
-    int* x = List_add(l, &i);
-    ListNode* item = List_find(l, x);
-    if (ListNode_data(item) != x) {
       result = -1;
     }
   }
