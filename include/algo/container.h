@@ -1,6 +1,7 @@
 #ifndef __ALGO_CONTAINER__
 #define __ALGO_CONTAINER__
 
+#include <stddef.h>
 #include <stdbool.h>
 
 typedef struct Array Array;
@@ -98,12 +99,13 @@ void Heap_print(Heap* h, HeapPrintFn print);
 
 typedef struct BTree BTree;
 
-BTree* new_BTree(int min_degree);
+typedef int (*BTreeCompareFn)(void* key1, void* key2);
+BTree* new_BTree(int min_degree, size_t key_size, size_t value_size, BTreeCompareFn compare);
 void delete_BTree(BTree* t);
 
-void BTree_insert(BTree* t, int value);
-void BTree_remove(BTree* t, int value);
-int BTree_find(BTree* t, int value);
+void BTree_insert(BTree* t, void* key, void* value);
+void BTree_remove(BTree* t, void* key);
+void* BTree_find(BTree* t, void* key);
 
 typedef void (*BTreePrintFn)(void* value);
 void BTree_print(BTree* t, BTreePrintFn print);

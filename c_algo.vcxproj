@@ -130,16 +130,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\algo\array.c" />
+    <ClCompile Include="src\algo\array_test.c" />
     <ClCompile Include="src\algo\btree.c" />
     <ClCompile Include="src\algo\btree_test.c" />
-    <ClCompile Include="src\algo\container.c" />
-    <ClCompile Include="src\algo\container_test.c" />
     <ClCompile Include="src\algo\hashmap.c" />
     <ClCompile Include="src\algo\hashmap_test.c" />
     <ClCompile Include="src\algo\heap.c" />
     <ClCompile Include="src\algo\heap_test.c" />
+    <ClCompile Include="src\algo\list.c" />
+    <ClCompile Include="src\algo\list_test.c" />
     <ClCompile Include="src\algo\map.c" />
     <ClCompile Include="src\algo\map_test.c" />
+    <ClCompile Include="src\algo\queue.c" />
+    <ClCompile Include="src\algo\queue_test.c" />
     <ClCompile Include="src\algo\sort.c" />
     <ClCompile Include="src\algo\sort_test.c" />
     <ClCompile Include="src\test.c" />
