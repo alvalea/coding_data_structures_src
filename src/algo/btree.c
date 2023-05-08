@@ -75,7 +75,7 @@ int BTreeNode_compare(BTreeNode* n, void* key1, void* key2) {
 
 // A utility function to split the child y of this node
 // Note that y must be full when this function is called
-  static
+static
 void BTreeNode_split_child(BTreeNode* n, int i, BTreeNode* y)
 {
   // Create a new node which is going to store (min-1) items
@@ -302,7 +302,7 @@ void BTreeNode_remove_from_non_leaf(BTreeNode* n, int idx, bool free_item) {
 
 // A function to borrow a key from C[idx-1] and insert it
 // into C[idx]
-  static
+static
 void BTreeNode_borrow_from_prev(BTreeNode* n, int idx)
 {
   BTreeNode* child = n->c[idx];
@@ -338,7 +338,7 @@ void BTreeNode_borrow_from_prev(BTreeNode* n, int idx)
 
 // A function to borrow an item from the c[idx+1] and place
 // it in c[idx]
-  static
+static
 void BTreeNode_borrow_from_next(BTreeNode* n, int idx)
 {
   BTreeNode* child = n->c[idx];
@@ -371,7 +371,7 @@ void BTreeNode_borrow_from_next(BTreeNode* n, int idx)
 }
 
 // A function to fill child c[idx] which has less than min-1 items
-  static
+static
 void BTreeNode_fill(BTreeNode* n, int idx)
 {
   // If the previous child(c[idx-1]) has more than min-1 items, borrow an item
