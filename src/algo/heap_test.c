@@ -55,7 +55,7 @@ int test_Heap_pop() {
   Heap* h = new_Heap(sizeof(string), n, test_Heap_bigger_string);
   {
     for (int i = 1; i<=n; ++i) {
-      _itoa_s(i, str, STR, 10);
+      sprintf(str, "%d", i);
       Heap_push(h, str);
     }
     for (int i = n; i>0; --i) {

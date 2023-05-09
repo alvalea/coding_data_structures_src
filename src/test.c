@@ -1,5 +1,7 @@
+#ifdef DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+#endif
 
 #include <stdio.h>
 #include <algo/container_test.h>
@@ -52,6 +54,7 @@ void test_main() {
 }
 
 int main() {
+#ifdef DEBUG
   _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
   _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
   _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
@@ -63,9 +66,11 @@ int main() {
   _CrtMemState sNew;
   _CrtMemState sDiff;
   _CrtMemCheckpoint(&sOld); //take a snapshot
+#endif
 
   test_main();
 
+#ifdef DEBUG
   _CrtMemCheckpoint(&sNew); //take a snapshot
   if (_CrtMemDifference(&sDiff, &sOld, &sNew)) // if there is a difference
   {
@@ -76,6 +81,7 @@ int main() {
       printf("-----------_CrtDumpMemoryLeaks ---------\n");
       _CrtDumpMemoryLeaks();
   }
+#endif
 
   return 0;
 }

@@ -55,3 +55,19 @@ clean:
 	del *.ilk \
 	del *.pdb \
 	del *.exe
+
+build_test_linux:
+	gcc -Wall -Iinclude src/algo/*.c src/test.c -o ./test
+
+run_test_linux:
+	./test
+
+gdb_test_linux:
+	gdb ./test
+
+valgrind_test_linux:
+	valgrind --leak-check=full --track-origins=yes ./test
+
+clean_linux:
+	rm test
+

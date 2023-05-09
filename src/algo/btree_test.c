@@ -39,13 +39,13 @@ int test_BTree_insert() {
     {
       for (int j=1; j<=50; ++j) {
         Value v = { .number = j };
-        _itoa_s(j, v.text, STR, 10);
+        sprintf(v.text, "%d", j);
         BTree_insert(t, &v, &v);
       }
       for (int j=1; j<=50; ++j) {
         if (j%3== 0) {
           Value v = { .number = j };
-          _itoa_s(j, v.text, STR, 10);
+          sprintf(v.text, "%d", j);
           BTree_remove(t, &v);
         }
       }

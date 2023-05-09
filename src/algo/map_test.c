@@ -33,7 +33,7 @@ int test_Map_insert() {
   {
     int i = 3;
     string str;
-    _itoa_s(i, str, STR, 10);
+    sprintf(str, "%d", i);
     Map_insert(m, str, &i);
     int* x = (int*)Map_find(m, str);
     if (*x != i) {
@@ -50,7 +50,7 @@ int test_Map_remove() {
   {
     int i = 3;
     string str;
-    _itoa_s(i, str, STR, 10);
+    sprintf(str, "%d", i);
     Map_insert(m, str, &i);
     Map_remove(m, str);
     if (Map_find(m, str) != NULL) {
@@ -67,7 +67,7 @@ int test_Map_find() {
   {
     int i = 3;
     string str;
-    _itoa_s(i, str, STR, 10);
+    sprintf(str, "%d", i);
     Map_insert(m, str, &i);
     int* x = (int*)Map_find(m, str);
     if (*x != i) {
