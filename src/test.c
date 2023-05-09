@@ -1,4 +1,4 @@
-#ifdef DEBUG
+#ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
@@ -54,7 +54,7 @@ void test_main() {
 }
 
 int main() {
-#ifdef DEBUG
+#ifdef _DEBUG
   _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
   _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
   _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
@@ -70,7 +70,7 @@ int main() {
 
   test_main();
 
-#ifdef DEBUG
+#ifdef _DEBUG
   _CrtMemCheckpoint(&sNew); //take a snapshot
   if (_CrtMemDifference(&sDiff, &sOld, &sNew)) // if there is a difference
   {

@@ -29,7 +29,6 @@ build_test:
 	cl \
 	/Zi \
 	/EHsc \
-	/W4 \
 	/D_DEBUG \
 	/MDd \
 	/Fetest.exe \
