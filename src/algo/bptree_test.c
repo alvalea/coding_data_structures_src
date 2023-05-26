@@ -1,0 +1,20 @@
+#include <algo/container_test.h>
+
+#include <algo/container.h>
+
+int test_BpTree_insert() {
+  int result = 0;
+  BpTree* t = new_BpTree(10);
+  {
+    for (int j = 1; j <= 50; ++j) {
+      BpTree_insert(t, j, j);
+    }
+    BpTree_print(t);
+  }
+  delete_BpTree(t);
+  return result;
+}
+
+int test_BpTree_find() {
+  return -1;
+}

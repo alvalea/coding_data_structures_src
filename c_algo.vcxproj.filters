@@ -66,6 +66,12 @@
     <ClCompile Include="src\algo\queue_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\algo\bptree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\bptree_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algo\container.h">

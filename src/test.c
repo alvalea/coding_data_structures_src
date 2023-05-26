@@ -50,6 +50,9 @@ void test_main() {
   test("test_BTree_insert", test_BTree_insert);
   test("test_BTree_find", test_BTree_find);
 
+  test("test_BpTree_insert", test_BpTree_insert);
+  test("test_BpTree_find", test_BpTree_find);
+
   test("test_quicksort", test_quicksort);
 }
 
