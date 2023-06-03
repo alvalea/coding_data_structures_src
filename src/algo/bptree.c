@@ -724,6 +724,11 @@ void BpTree_remove(BpTree* t, int key) {
 }
 
 int BpTree_find(BpTree* t, int key) {
+  BpTreeNodeEntry entry = BpTree_find_entry(t, key);
+  if (entry.r != NULL) {
+    return entry.r->value;
+  }
+  return -1;
 }
 
 void BpTree_print(BpTree* t) {
