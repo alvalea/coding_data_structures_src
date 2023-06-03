@@ -37,19 +37,24 @@ BpTreeNode* new_BpTreeNode(bool leaf, int min) {
 }
 
 static
+void BpTreeNode_free(BpTreeNode* n) {
+  free(n->keys);
+  free(n->c);
+  free(n);
+}
+
+static
 void delete_BpTreeNode(BpTreeNode* n) {
   if (!n->leaf) {
     for (int i=0; i<=n->count; ++i) {
       delete_BpTreeNode(n->c[i]);
     }
   } else {
-    for (int i = 0; i <= n->count; ++i) {
+    for (int i = 0; i < n->count; ++i) {
       free(n->c[i]);
     }
   }
-  free(n->keys);
-  free(n->c);
-  free(n);
+  BpTreeNode_free(n);
 }
 
 static
@@ -129,6 +134,67 @@ void BpTreeNode_print_tree(BpTreeNode* n, int child, string str) {
   }
 }
 
+static
+void BpTreeNode_remove(BpTreeNode* n, int key, BpTreeNode* entry) {
+  // Remove the key and shift other keys accordingly.
+  int i = 0;
+  while (n->keys[i] != key) {
+    i++;
+  }
+  for (++i; i < n->count; i++) {
+    n->keys[i - 1] = n->keys[i];
+  }
+
+  // Remove the pointer and shift other c accordingly.
+  // First determine number of c.
+  int num_c = n->leaf ? n->count : n->count + 1;
+  i = 0;
+  while (n->c[i] != entry) {
+    i++;
+  }
+  for (++i; i < num_c; i++) {
+    n->c[i - 1] = n->c[i];
+  }
+
+
+  // One key fewer.
+  n->count--;
+
+  // Set the other c to NULL for tidiness.
+  // A leaf uses the last pointer to point to the next leaf.
+  if (n->leaf) {
+    for (i = n->count; i < n->min - 1; i++) {
+      n->c[i] = NULL;
+    }
+  } else {
+    for (i = n->count + 1; i < n->min; i++) {
+      n->c[i] = NULL;
+    }
+  }
+}
+
+/* Utility function for deletion.  Retrieves
+ * the index of a node's nearest neighbor (sibling)
+ * to the left if one exists.  If not (the node
+ * is the leftmost child), returns -1 to signify
+ * this special case.
+ */
+static
+int BpTreeNode_neighbor_index(BpTreeNode* n) {
+  /* Return the index of the key to the left
+   * of the pointer in the parent pointing
+   * to n.  
+   * If n is the leftmost child, this means
+   * return -1.
+   */
+  for (int i = 0; i <= n->parent->count; i++) {
+    if (n->parent->c[i] == n) {
+      return i - 1;
+    }
+  }
+  return -1;
+}
+
 //===========================================================================
 
 struct BpTree {
@@ -137,6 +203,11 @@ struct BpTree {
 };
 
 BpTree* new_BpTree(int min_degree) {
+  if (min_degree < 3) {
+    printf("\n[ERROR] Degree: %d < Minimum Degree: 3\n", min_degree);
+    exit(1);
+  }
+
   BpTree* t = calloc(1, sizeof(BpTree));
   t->min = min_degree;
   return t;
@@ -411,7 +482,245 @@ void BpTree_insert(BpTree* t, int key, int value) {
   BpTree_leaf_split(t, leaf, key, r);
 }
 
+static
+void BpTree_adjust(BpTree* t) {
+  /* Case: nonempty root.
+   * Key and pointer have already been deleted,
+   * so nothing to be done.
+   */
+  if (t->root->count > 0) {
+    return;
+  }
+
+  /* Case: empty root. 
+  */
+
+  // If it has a child, promote 
+  // the first (only) child
+  // as the new root.
+  BpTreeNode* new_root = NULL;
+  if (!t->root->leaf) {
+    new_root = t->root->c[0];
+    new_root->parent = NULL;
+  }
+
+  BpTreeNode_free(t->root);
+  t->root = new_root;
+}
+
+static
+void BpTree_remove_entry(BpTree* t, BpTreeNode* n, int key, BpTreeNode* entry);
+
+/* Merges a node that has become
+ * too small after deletion
+ * with a neighboring node that
+ * can accept the additional entries
+ * without exceeding the maximum.
+ */
+static
+void BpTree_merge(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor, int neighbor_index,
+    int k_prime) {
+
+  BpTreeNode* tmp;
+
+  /* Swap neighbor with node if node is on the
+   * extreme left and neighbor is to its right.
+   */
+  if (neighbor_index == -1) {
+    tmp = n;
+    n = neighbor;
+    neighbor = tmp;
+  }
+
+  /* Starting point in the neighbor for copying
+   * keys and pointers from n.
+   * Recall that n and neighbor have swapped places
+   * in the special case of n being a leftmost child.
+   */
+  int neighbor_insertion_index = neighbor->count;
+
+  /* Case:  nonleaf node.
+   * Append k_prime and the following pointer.
+   * Append all pointers and keys from the neighbor.
+   */
+  if (!n->leaf) {
+
+    /* Append k_prime.
+    */
+    neighbor->keys[neighbor_insertion_index] = k_prime;
+    neighbor->count++;
+
+
+    int n_end = n->count;
+    int i = 0;
+    int j = 0;
+    for (i = neighbor_insertion_index + 1, j = 0; j < n_end; i++, j++) {
+      neighbor->keys[i] = n->keys[j];
+      neighbor->c[i] = n->c[j];
+      neighbor->count++;
+      n->count--;
+    }
+
+    /* The number of pointers is always
+     * one more than the number of keys.
+     */
+    neighbor->c[i] = n->c[j];
+
+    /* All children must now point up to the same parent.
+    */
+    for (i = 0; i < neighbor->count + 1; i++) {
+      tmp = (BpTreeNode*)neighbor->c[i];
+      tmp->parent = neighbor;
+    }
+  }
+
+  /* In a leaf, append the keys and pointers of
+   * n to the neighbor.
+   * Set the neighbor's last pointer to point to
+   * what had been n's right neighbor.
+   */
+  else {
+    for (int i = neighbor_insertion_index, j = 0; j < n->count; i++, j++) {
+      neighbor->keys[i] = n->keys[j];
+      neighbor->c[i] = n->c[j];
+      neighbor->count++;
+    }
+    neighbor->c[t->min - 1] = n->c[t->min - 1];
+  }
+
+  BpTree_remove_entry(t, n->parent, k_prime, n);
+  BpTreeNode_free(n);
+}
+
+/* Redistributes entries between two nodes when
+ * one has become too small after deletion
+ * but its neighbor is too big to append the
+ * small node's entries without exceeding the
+ * maximum
+ */
+static
+void BpTree_redistribute(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor,
+    int neighbor_index, int k_prime_index, int k_prime) {
+  int i;
+  BpTreeNode* tmp;
+
+  /* Case: n has a neighbor to the left. 
+   * Pull the neighbor's last key-pointer pair over
+   * from the neighbor's right end to n's left end.
+   */
+  if (neighbor_index != -1) {
+    if (!n->leaf)
+      n->c[n->count + 1] = n->c[n->count];
+    for (i = n->count; i > 0; i--) {
+      n->keys[i] = n->keys[i - 1];
+      n->c[i] = n->c[i - 1];
+    }
+    if (!n->leaf) {
+      n->c[0] = neighbor->c[neighbor->count];
+      tmp = (BpTreeNode*)n->c[0];
+      tmp->parent = n;
+      neighbor->c[neighbor->count] = NULL;
+      n->keys[0] = k_prime;
+      n->parent->keys[k_prime_index] = neighbor->keys[neighbor->count - 1];
+    }
+    else {
+      n->c[0] = neighbor->c[neighbor->count - 1];
+      neighbor->c[neighbor->count - 1] = NULL;
+      n->keys[0] = neighbor->keys[neighbor->count - 1];
+      n->parent->keys[k_prime_index] = n->keys[0];
+    }
+  }
+
+  /* Case: n is the leftmost child.
+   * Take a key-pointer pair from the neighbor to the right.
+   * Move the neighbor's leftmost key-pointer pair
+   * to n's rightmost position.
+   */
+  else {  
+    if (n->leaf) {
+      n->keys[n->count] = neighbor->keys[0];
+      n->c[n->count] = neighbor->c[0];
+      n->parent->keys[k_prime_index] = neighbor->keys[1];
+    }
+    else {
+      n->keys[n->count] = k_prime;
+      n->c[n->count + 1] = neighbor->c[0];
+      tmp = (BpTreeNode*)n->c[n->count + 1];
+      tmp->parent = n;
+      n->parent->keys[k_prime_index] = neighbor->keys[0];
+    }
+    for (i = 0; i < neighbor->count - 1; i++) {
+      neighbor->keys[i] = neighbor->keys[i + 1];
+      neighbor->c[i] = neighbor->c[i + 1];
+    }
+    if (!n->leaf)
+      neighbor->c[i] = neighbor->c[i + 1];
+  }
+
+  /* n now has one more key and one more pointer;
+   * the neighbor has one fewer of each.
+   */
+  n->count++;
+  neighbor->count--;
+}
+
+static
+void BpTree_remove_entry(BpTree* t, BpTreeNode* n, int key, BpTreeNode* entry) {
+  BpTreeNode_remove(n, key, entry);
+
+  if (n == t->root) {
+    BpTree_adjust(t);
+    return;
+  }
+
+  /* Case:  deletion from a node below the root.
+   * (Rest of function body.)
+   */
+
+  /* Determine minimum allowable size of node,
+   * to be preserved after deletion.
+   */
+  int min_keys = n->leaf ? find_split(t->min - 1) : find_split(t->min) - 1;
+
+  /* Case:  node stays at or above minimum.
+   * (The simple case.)
+   */
+  if (n->count >= min_keys) {
+    return;
+  }
+
+  /* Case:  node falls below minimum.
+   * Either merge or redistribution
+   * is needed.
+   */
+
+  /* Find the appropriate neighbor node with which
+   * to merge.
+   * Also find the key (k_prime) in the parent
+   * between the pointer to node n and the pointer
+   * to the neighbor.
+   */
+  int neighbor_index = BpTreeNode_neighbor_index(n);
+  int k_prime_index = neighbor_index == -1 ? 0 : neighbor_index;
+  int k_prime = n->parent->keys[k_prime_index];
+  BpTreeNode* neighbor = neighbor_index == -1 ? n->parent->c[1] : 
+    n->parent->c[neighbor_index];
+  int capacity = n->leaf ? t->min : t->min - 1;
+
+  if (neighbor->count + n->count < capacity) {
+    BpTree_merge(t, n, neighbor, neighbor_index, k_prime);
+  } else {
+    BpTree_redistribute(t, n, neighbor, neighbor_index, k_prime_index, k_prime);
+  }
+}
+
 void BpTree_remove(BpTree* t, int key) {
+  BpTreeNodeEntry entry = BpTree_find_entry(t, key);
+
+  if (entry.r != NULL && entry.n != NULL) {
+    BpTree_remove_entry(t, entry.n, key, (BpTreeNode*)entry.r);
+    free(entry.r);
+  }
 }
 
 int BpTree_find(BpTree* t, int key) {
