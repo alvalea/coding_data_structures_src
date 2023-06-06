@@ -114,11 +114,14 @@ void BTree_print(BTree* t, BTreePrintFn print);
 
 typedef struct BpTree BpTree;
 
-BpTree* new_BpTree(int min_degree);
+BpTree* new_BpTree(int min_degree, size_t value_size);
 void delete_BpTree(BpTree* t);
 
-void BpTree_insert(BpTree* t, int key, int value);
+void BpTree_insert(BpTree* t, int key, void* value);
 void BpTree_remove(BpTree* t, int key);
-int BpTree_find(BpTree* t, int key);
+void* BpTree_find(BpTree* t, int key);
+
+typedef void (*BpTreePrintFn)(void* value);
+void BpTree_print(BpTree* t, BpTreePrintFn print);
 
 #endif

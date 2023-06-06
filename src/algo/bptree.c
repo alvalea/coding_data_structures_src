@@ -8,10 +8,6 @@
 #define STR 100
 typedef char string[STR];
 
-typedef struct record {
-  int value;
-} record;
-
 typedef struct BpTreeNode {
   bool leaf;
   int min;	 // Minimum degree (defines the range for number of items)
@@ -23,7 +19,7 @@ typedef struct BpTreeNode {
 
 typedef struct BpTreeNodeEntry {
   BpTreeNode* n;
-  record* r;
+  void* r;
 } BpTreeNodeEntry;
 
 static
@@ -63,7 +59,7 @@ bool BpTreeNode_full(BpTreeNode* n) {
 }
 
 static
-void BpTreeNode_leaf_insert(BpTreeNode* n, int key, record* r) {
+void BpTreeNode_leaf_insert(BpTreeNode* n, int key, void* value) {
   int insertion_point = 0;
   while (insertion_point < n->count && n->keys[insertion_point] < key) {
     insertion_point++;
@@ -75,7 +71,7 @@ void BpTreeNode_leaf_insert(BpTreeNode* n, int key, record* r) {
     sizeof(void*) * (n->count - insertion_point));
 
   n->keys[insertion_point] = key;
-  n->c[insertion_point] = r;
+  n->c[insertion_point] = value;
   n->count++;
 }
 
@@ -101,7 +97,7 @@ int BpTreeNode_left_index(BpTreeNode* n, BpTreeNode* left) {
 }
 
 static
-void BpTreeNode_print_page(BpTreeNode* n, int child, string str) {
+void BpTreeNode_print_page(BpTreeNode* n, int child, string str, BpTreePrintFn print) {
   strcat(str, "     ");
   for (int j = 1; j <= child; ++j) {
     strcat(str, "| ");
@@ -112,8 +108,7 @@ void BpTreeNode_print_page(BpTreeNode* n, int child, string str) {
   for (int i = 0; i < n->count; ++i) {
     printf("%d ", n->keys[i]);
     if (n->leaf) {
-      record* r = (record*)n->c[i];
-      printf("[%d] ", r->value);
+      print(n->c[i]);
     }
   }
 
@@ -121,14 +116,14 @@ void BpTreeNode_print_page(BpTreeNode* n, int child, string str) {
 }
 
 static
-void BpTreeNode_print_tree(BpTreeNode* n, int child, string str) {
+void BpTreeNode_print_tree(BpTreeNode* n, int child, string str, BpTreePrintFn print) {
   if (n != NULL) {
     string s = "";
     strcpy(s, str);
-    BpTreeNode_print_page(n, child, s);
+    BpTreeNode_print_page(n, child, s, print);
     for (int i = n->count; i >= 0; --i) {
       if (!n->leaf) {
-        BpTreeNode_print_tree(n->c[i], i, s);
+        BpTreeNode_print_tree(n->c[i], i, s, print);
       }
     }
   }
@@ -190,10 +185,11 @@ int BpTreeNode_neighbor_index(BpTreeNode* n) {
 
 struct BpTree {
   int min;
+  size_t value_size;
   BpTreeNode* root;
 };
 
-BpTree* new_BpTree(int min_degree) {
+BpTree* new_BpTree(int min_degree, size_t value_size) {
   if (min_degree < 3) {
     printf("\n[ERROR] Degree: %d < Minimum Degree: 3\n", min_degree);
     exit(1);
@@ -201,6 +197,7 @@ BpTree* new_BpTree(int min_degree) {
 
   BpTree* t = calloc(1, sizeof(BpTree));
   t->min = min_degree;
+  t->value_size = value_size;
   return t;
 }
 
@@ -241,7 +238,7 @@ BpTreeNodeEntry BpTree_find_entry(BpTree* t, int key) {
     if (i != leaf->count) {
       return (BpTreeNodeEntry){
         .n = leaf,
-          .r = (record*)leaf->c[i]
+        .r = leaf->c[i]
       };
     }
   }
@@ -249,10 +246,10 @@ BpTreeNodeEntry BpTree_find_entry(BpTree* t, int key) {
 }
 
 static
-void BpTree_create_root(BpTree* t, int key, record* r) {
+void BpTree_create_root(BpTree* t, int key, void* value) {
   BpTreeNode* n = new_BpTreeNode(true, t->min);
   n->keys[0] = key;
-  n->c[0] = r;
+  n->c[0] = value;
   n->count++;
   t->root = n;
 }
@@ -384,7 +381,7 @@ void BpTree_parent_insert(BpTree* t, BpTreeNode* left, int key, BpTreeNode* righ
 }
 
 static
-void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, record* r,
+void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, void* value,
   BpTreeNode* new_leaf, int* temp_keys, void** temp_c) {
   int insertion_index = 0;
   while (insertion_index < t->min - 1 && leaf->keys[insertion_index] < key) {
@@ -401,7 +398,7 @@ void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, record* 
   }
 
   temp_keys[insertion_index] = key;
-  temp_c[insertion_index] = r;
+  temp_c[insertion_index] = value;
 
   leaf->count = 0;
 
@@ -417,13 +414,13 @@ void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, record* 
 }
 
 static
-void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, record* r) {
+void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, void* value) {
   BpTreeNode* new_leaf = new_BpTreeNode(true, t->min);
 
   int* temp_keys = calloc(t->min, sizeof(int));
   void** temp_c = calloc(t->min, sizeof(void *));
   {
-    BpTree_leaf_split_allocation(t, leaf, key, r, new_leaf, temp_keys, temp_c);
+    BpTree_leaf_split_allocation(t, leaf, key, value, new_leaf, temp_keys, temp_c);
   }
   free(temp_c);
   free(temp_keys);
@@ -440,22 +437,22 @@ void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, record* r) {
   BpTree_parent_insert(t, leaf, new_key, new_leaf);
 }
 
-void BpTree_insert(BpTree* t, int key, int value) {
+void BpTree_insert(BpTree* t, int key, void* value) {
   // The current implementation ignores duplicates
   BpTreeNodeEntry entry = BpTree_find_entry(t, key);
   if (entry.r != NULL) {
     // If the key already exists in this tree, update the value
-    entry.r->value = value;
+    memcpy(entry.r, value, t->value_size);
     return;
   }
 
   // Create a new record for the value
-  record* r = calloc(1, sizeof(record));
-  r->value = value;
+  void* node_value = malloc(t->value_size);
+  memcpy(node_value, value, t->value_size);
 
   // Case: the tree does not exist yet. Start a new tree
   if (t->root == NULL) {
-    BpTree_create_root(t, key, r);
+    BpTree_create_root(t, key, node_value);
     return;
   }
 
@@ -464,12 +461,12 @@ void BpTree_insert(BpTree* t, int key, int value) {
 
   // Case: leaf has room for key and record_pointer
   if (!BpTreeNode_full(leaf)) {
-    BpTreeNode_leaf_insert(leaf, key, r);
+    BpTreeNode_leaf_insert(leaf, key, node_value);
     return;
   }
 
   // Case:  leaf must be split
-  BpTree_leaf_split(t, leaf, key, r);
+  BpTree_leaf_split(t, leaf, key, node_value);
 }
 
 static
@@ -705,16 +702,16 @@ void BpTree_remove(BpTree* t, int key) {
   }
 }
 
-int BpTree_find(BpTree* t, int key) {
+void* BpTree_find(BpTree* t, int key) {
   BpTreeNodeEntry entry = BpTree_find_entry(t, key);
   if (entry.r != NULL) {
-    return entry.r->value;
+    return entry.r;
   }
-  return -1;
+  return NULL;
 }
 
-void BpTree_print(BpTree* t) {
+void BpTree_print(BpTree* t, BpTreePrintFn print) {
   printf("\n");
   string s = "";
-  BpTreeNode_print_tree(t->root, 0, s);
+  BpTreeNode_print_tree(t->root, 0, s, print);
 }
