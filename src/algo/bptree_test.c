@@ -7,10 +7,10 @@ int test_BpTree_insert() {
   for (int i=3; i<6; ++i) {
     BpTree* t = new_BpTree(i);
     {
-      for (int j=1; j<=50; ++j) {
+      for (int j=50; j>0; --j) {
         BpTree_insert(t, j, j);
       }
-      for (int j=1; j<=50; ++j) {
+      for (int j = 50; j > 0; --j) {
         if (j%3== 0) {
           BpTree_remove(t, j);
         }
@@ -35,6 +35,7 @@ int test_BpTree_find() {
         }
       }
     }
+
     int x = BpTree_find(t, 20);
     if (x != 20) {
       result = -1;

@@ -64,17 +64,16 @@ bool BpTreeNode_full(BpTreeNode* n) {
 
 static
 void BpTreeNode_leaf_insert(BpTreeNode* n, int key, record* r) {
-  // TODO
-  // Replace with algorithm from BTreeNode_insert_non_full
   int insertion_point = 0;
   while (insertion_point < n->count && n->keys[insertion_point] < key) {
     insertion_point++;
   }
 
-  for (int i = n->count; i > insertion_point; i--) {
-    n->keys[i] = n->keys[i - 1];
-    n->c[i] = n->c[i - 1];
-  }
+  memmove(&n->keys[insertion_point + 1], &n->keys[insertion_point],
+    sizeof(int) * (n->count - insertion_point));
+  memmove(&n->c[insertion_point + 1], &n->c[insertion_point],
+    sizeof(void*) * (n->count - insertion_point));
+
   n->keys[insertion_point] = key;
   n->c[insertion_point] = r;
   n->count++;
@@ -82,10 +81,11 @@ void BpTreeNode_leaf_insert(BpTreeNode* n, int key, record* r) {
 
 static
 void BpTreeNode_node_insert(BpTreeNode* n, int left_index, int key, BpTreeNode* right) {
-  for (int i = n->count; i > left_index; i--) {
-    n->c[i + 1] = n->c[i];
-    n->keys[i] = n->keys[i - 1];
-  }
+  memmove(&n->keys[left_index + 1], &n->keys[left_index],
+    sizeof(int) * (n->count - left_index));
+  memmove(&n->c[left_index + 2], &n->c[left_index + 1],
+    sizeof(void*) * (n->count - left_index));
+
   n->c[left_index + 1] = right;
   n->keys[left_index] = key;
   n->count++;
@@ -141,9 +141,7 @@ void BpTreeNode_remove(BpTreeNode* n, int key, BpTreeNode* entry) {
   while (n->keys[i] != key) {
     i++;
   }
-  for (++i; i < n->count; i++) {
-    n->keys[i - 1] = n->keys[i];
-  }
+  memmove(&n->keys[i], &n->keys[i + 1], sizeof(int) * (n->count - (i + 1)));
 
   // Remove the pointer and shift other c accordingly.
   // First determine number of c.
@@ -152,10 +150,7 @@ void BpTreeNode_remove(BpTreeNode* n, int key, BpTreeNode* entry) {
   while (n->c[i] != entry) {
     i++;
   }
-  for (++i; i < num_c; i++) {
-    n->c[i - 1] = n->c[i];
-  }
-
+  memmove(&n->c[i], &n->c[i + 1], sizeof(void*) * (num_c - (i + 1)));
 
   // One key fewer.
   n->count--;
@@ -163,13 +158,9 @@ void BpTreeNode_remove(BpTreeNode* n, int key, BpTreeNode* entry) {
   // Set the other c to NULL for tidiness.
   // A leaf uses the last pointer to point to the next leaf.
   if (n->leaf) {
-    for (i = n->count; i < n->min - 1; i++) {
-      n->c[i] = NULL;
-    }
+    memset(&n->c[n->count], 0, sizeof(void*) * ((n->min - 1) - n->count));
   } else {
-    for (i = n->count + 1; i < n->min; i++) {
-      n->c[i] = NULL;
-    }
+    memset(&n->c[n->count + 1], 0, sizeof(void*) * (n->min - (n->count + 1)));
   }
 }
 
@@ -291,6 +282,45 @@ static
 void BpTree_parent_insert(BpTree* t, BpTreeNode* left, int key, BpTreeNode* right);
 
 static
+int BpTree_node_split_allocation(BpTree* t, BpTreeNode* old_node, int left_index, int key,
+    BpTreeNode* right, BpTreeNode* new_node, int* temp_keys, void** temp_c) {
+  int k_prime = 0;
+  memcpy(&temp_keys[0], &old_node->keys[0], sizeof(int) * old_node->count);
+  memcpy(&temp_c[0], &old_node->c[0], sizeof(void*) * (old_node->count + 1));
+  if (left_index < old_node->count) {
+    memmove(&temp_keys[left_index + 1], &temp_keys[left_index],
+        sizeof(int) * (old_node->count - left_index));
+    memmove(&temp_c[left_index + 2], &temp_c[left_index + 1],
+        sizeof(void*) * (old_node->count - left_index));
+  }
+
+  temp_c[left_index + 1] = right;
+  temp_keys[left_index] = key;
+
+  /* Create the new node and copy
+   * half the keys and c to the
+   * old and half to the new.
+   */  
+  int split = find_split(t->min);
+  k_prime = temp_keys[split - 1];
+
+  memcpy(&old_node->keys[0], &temp_keys[0], sizeof(int) * (split - 1));
+  memcpy(&old_node->c[0], &temp_c[0], sizeof(void*) * split);
+  old_node->count = split - 1;
+
+  memcpy(&new_node->keys[0], &temp_keys[split], sizeof(int) * (t->min - split));
+  memcpy(&new_node->c[0], &temp_c[split], sizeof(void*) * (t->min + 1 - split));
+  new_node->count = t->min - split;
+
+  new_node->parent = old_node->parent;
+  for (int i = 0; i <= new_node->count; i++) {
+    BpTreeNode* child = new_node->c[i];
+    child->parent = new_node;
+  }
+  return k_prime;
+}
+
+static
 void BpTree_node_split(BpTree* t, BpTreeNode* old_node, int left_index, int key,
     BpTreeNode* right) {
   /* First create a temporary set of keys and c
@@ -302,51 +332,12 @@ void BpTree_node_split(BpTree* t, BpTreeNode* old_node, int left_index, int key,
    * the other half to the new.
    */
   int k_prime = 0;
-  BpTreeNode* new_node;
+  BpTreeNode* new_node = new_BpTreeNode(false, t->min);
   BpTreeNode** temp_c = calloc(t->min + 1, sizeof(BpTreeNode*));
   int* temp_keys = calloc(t->min, sizeof(int));
   {
-    for (int i = 0, j = 0; i < old_node->count + 1; i++, j++) {
-      if (j == left_index + 1) j++;
-      temp_c[j] = old_node->c[i];
-    }
-
-    for (int i = 0, j = 0; i < old_node->count; i++, j++) {
-      if (j == left_index) j++;
-      temp_keys[j] = old_node->keys[i];
-    }
-
-    temp_c[left_index + 1] = right;
-    temp_keys[left_index] = key;
-
-    /* Create the new node and copy
-     * half the keys and c to the
-     * old and half to the new.
-     */  
-    int split = find_split(t->min);
-    new_node = new_BpTreeNode(false, t->min);
-    old_node->count = 0;
-    int i = 0;
-    for (i = 0; i < split - 1; i++) {
-      old_node->c[i] = temp_c[i];
-      old_node->keys[i] = temp_keys[i];
-      old_node->count++;
-    }
-    old_node->c[i] = temp_c[i];
-    k_prime = temp_keys[split - 1];
-    int j = 0;
-    for (++i; i < t->min; i++, j++) {
-      new_node->c[j] = temp_c[i];
-      new_node->keys[j] = temp_keys[i];
-      new_node->count++;
-    }
-    new_node->c[j] = temp_c[i];
-
-    new_node->parent = old_node->parent;
-    for (int i = 0; i <= new_node->count; i++) {
-      BpTreeNode* child = new_node->c[i];
-      child->parent = new_node;
-    }
+    k_prime = BpTree_node_split_allocation(t, old_node, left_index, key, right,
+      new_node, temp_keys, temp_c);
   }
   free(temp_c);
   free(temp_keys);
@@ -393,43 +384,46 @@ void BpTree_parent_insert(BpTree* t, BpTreeNode* left, int key, BpTreeNode* righ
 }
 
 static
-void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, record* r) {
-  // TODO: use memmove
+void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, record* r,
+  BpTreeNode* new_leaf, int* temp_keys, void** temp_c) {
+  int insertion_index = 0;
+  while (insertion_index < t->min - 1 && leaf->keys[insertion_index] < key) {
+    insertion_index++;
+  }
 
+  memcpy(&temp_keys[0], &leaf->keys[0], sizeof(int) * leaf->count);
+  memcpy(&temp_c[0], &leaf->c[0], sizeof(void*) * leaf->count);
+  if (insertion_index < leaf->count) {
+    memmove(&temp_keys[insertion_index + 1], &temp_keys[insertion_index],
+        sizeof(int) * (leaf->count - insertion_index));
+    memmove(&temp_c[insertion_index + 1], &temp_c[insertion_index],
+        sizeof(void*) * (leaf->count - insertion_index));
+  }
+
+  temp_keys[insertion_index] = key;
+  temp_c[insertion_index] = r;
+
+  leaf->count = 0;
+
+  int split = find_split(t->min - 1);
+
+  memcpy(&leaf->keys[0], &temp_keys[0], sizeof(int) * split);
+  memcpy(&leaf->c[0], &temp_c[0], sizeof(void*) * split);
+  leaf->count = split;
+
+  memcpy(&new_leaf->keys[0], &temp_keys[split], sizeof(int) * (t->min - split));
+  memcpy(&new_leaf->c[0], &temp_c[split], sizeof(void*) * (t->min - split));
+  new_leaf->count = t->min - split;
+}
+
+static
+void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, record* r) {
   BpTreeNode* new_leaf = new_BpTreeNode(true, t->min);
 
   int* temp_keys = calloc(t->min, sizeof(int));
   void** temp_c = calloc(t->min, sizeof(void *));
   {
-    int insertion_index = 0;
-    while (insertion_index < t->min - 1 && leaf->keys[insertion_index] < key) {
-      insertion_index++;
-    }
-
-    for (int i = 0, j = 0; i < leaf->count; i++, j++) {
-      if (j == insertion_index) j++;
-      temp_keys[j] = leaf->keys[i];
-      temp_c[j] = leaf->c[i];
-    }
-
-    temp_keys[insertion_index] = key;
-    temp_c[insertion_index] = r;
-
-    leaf->count = 0;
-
-    int split = find_split(t->min - 1);
-
-    for (int i = 0; i < split; i++) {
-      leaf->c[i] = temp_c[i];
-      leaf->keys[i] = temp_keys[i];
-      leaf->count++;
-    }
-
-    for (int i = split, j = 0; i < t->min; i++, j++) {
-      new_leaf->c[j] = temp_c[i];
-      new_leaf->keys[j] = temp_keys[i];
-      new_leaf->count++;
-    }
+    BpTree_leaf_split_allocation(t, leaf, key, r, new_leaf, temp_keys, temp_c);
   }
   free(temp_c);
   free(temp_keys);
@@ -437,12 +431,8 @@ void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, record* r) {
   new_leaf->c[t->min - 1] = leaf->c[t->min - 1];
   leaf->c[t->min - 1] = new_leaf;
 
-  for (int i = leaf->count; i < t->min - 1; i++) {
-    leaf->c[i] = NULL;
-  }
-  for (int i = new_leaf->count; i < t->min - 1; i++) {
-    new_leaf->c[i] = NULL;
-  }
+  memset(&leaf->c[leaf->count], 0, sizeof(void*) * ((t->min - 1) - leaf->count));
+  memset(&new_leaf->c[new_leaf->count], 0, sizeof(void*) * ((t->min - 1) - new_leaf->count));
 
   new_leaf->parent = leaf->parent;
   int new_key = new_leaf->keys[0];
@@ -550,25 +540,17 @@ void BpTree_merge(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor, int neighbor_i
     neighbor->keys[neighbor_insertion_index] = k_prime;
     neighbor->count++;
 
-
     int n_end = n->count;
-    int i = 0;
-    int j = 0;
-    for (i = neighbor_insertion_index + 1, j = 0; j < n_end; i++, j++) {
-      neighbor->keys[i] = n->keys[j];
-      neighbor->c[i] = n->c[j];
-      neighbor->count++;
-      n->count--;
-    }
-
-    /* The number of pointers is always
-     * one more than the number of keys.
-     */
-    neighbor->c[i] = n->c[j];
+    memmove(&neighbor->keys[neighbor_insertion_index + 1], &n->keys[0],
+      sizeof(int) * n_end);
+    memmove(&neighbor->c[neighbor_insertion_index + 1], &n->c[0],
+      sizeof(void*) * (n_end + 1));
+    neighbor->count += n_end;
+    n->count -= n_end;
 
     /* All children must now point up to the same parent.
     */
-    for (i = 0; i < neighbor->count + 1; i++) {
+    for (int i = 0; i < neighbor->count + 1; i++) {
       tmp = (BpTreeNode*)neighbor->c[i];
       tmp->parent = neighbor;
     }
@@ -580,11 +562,11 @@ void BpTree_merge(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor, int neighbor_i
    * what had been n's right neighbor.
    */
   else {
-    for (int i = neighbor_insertion_index, j = 0; j < n->count; i++, j++) {
-      neighbor->keys[i] = n->keys[j];
-      neighbor->c[i] = n->c[j];
-      neighbor->count++;
-    }
+    memmove(&neighbor->keys[neighbor_insertion_index], &n->keys[0],
+      sizeof(int) * n->count);
+    memmove(&neighbor->c[neighbor_insertion_index], &n->c[0],
+      sizeof(void*) * n->count);
+    neighbor->count += n->count;
     neighbor->c[t->min - 1] = n->c[t->min - 1];
   }
 
@@ -609,12 +591,12 @@ void BpTree_redistribute(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor,
    * from the neighbor's right end to n's left end.
    */
   if (neighbor_index != -1) {
-    if (!n->leaf)
+    if (!n->leaf) {
       n->c[n->count + 1] = n->c[n->count];
-    for (i = n->count; i > 0; i--) {
-      n->keys[i] = n->keys[i - 1];
-      n->c[i] = n->c[i - 1];
     }
+    memmove(&n->keys[1], &n->keys[0], sizeof(int) * n->count);
+    memmove(&n->c[1], &n->c[0], sizeof(void*) * n->count);
+
     if (!n->leaf) {
       n->c[0] = neighbor->c[neighbor->count];
       tmp = (BpTreeNode*)n->c[0];
@@ -649,12 +631,12 @@ void BpTree_redistribute(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor,
       tmp->parent = n;
       n->parent->keys[k_prime_index] = neighbor->keys[0];
     }
-    for (i = 0; i < neighbor->count - 1; i++) {
-      neighbor->keys[i] = neighbor->keys[i + 1];
-      neighbor->c[i] = neighbor->c[i + 1];
+    memmove(&neighbor->keys[0], &neighbor->keys[1], sizeof(int) * (neighbor->count - 1));
+    memmove(&neighbor->c[0], &neighbor->c[1], sizeof(void*) * (neighbor->count - 1));
+
+    if (!n->leaf) {
+      neighbor->c[neighbor->count - 1] = neighbor->c[neighbor->count];
     }
-    if (!n->leaf)
-      neighbor->c[i] = neighbor->c[i + 1];
   }
 
   /* n now has one more key and one more pointer;
