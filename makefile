@@ -56,13 +56,13 @@ clean:
 	del *.exe
 
 build_test_linux:
-	gcc -Wall -Iinclude src/algo/*.c src/test.c -o ./test
+	clang -g -Wall -Iinclude src/algo/*.c src/test.c -o ./test
 
 run_test_linux:
 	./test
 
-gdb_test_linux:
-	gdb ./test
+debug_test_linux:
+	lldb ./test
 
 valgrind_test_linux:
 	valgrind --leak-check=full --track-origins=yes ./test
