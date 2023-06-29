@@ -1,1 +1,0 @@
-/home/al/al/dotfiles/cpp/.vimrc
