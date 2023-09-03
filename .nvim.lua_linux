@@ -1,4 +1,4 @@
-vim.opt.makeprg = "make build_linux"
+vim.opt.makeprg = "make build_debug_linux"
 
 require'lspconfig'.clangd.setup{}
 
