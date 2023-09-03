@@ -16,6 +16,6 @@ jobs:
     - name: apt install valgrind
       run: sudo apt-get -y install valgrind
     - name: build
-      run: make build_test_linux
+      run: make build_linux
     - name: run
-      run: make valgrind_test_linux
+      run: make valgrind_linux
