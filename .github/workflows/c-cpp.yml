@@ -13,8 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: apt install valgrind
-      run: sudo apt-get -y install valgrind
+    - name: apt install valgrind clang
+      run: sudo apt-get -y install valgrind clang
     - name: build
       run: make build_linux
     - name: run
