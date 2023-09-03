@@ -98,9 +98,9 @@ int BpTreeNode_left_index(BpTreeNode* n, BpTreeNode* left) {
 
 static
 void BpTreeNode_print_page(BpTreeNode* n, int child, string str, BpTreePrintFn print) {
-  strcat(str, "     ");
+  strcat_s(str, STR, "     ");
   for (int j = 1; j <= child; ++j) {
-    strcat(str, "| ");
+    strcat_s(str, STR, "| ");
   }
   printf("%s", str);
 
@@ -119,7 +119,7 @@ static
 void BpTreeNode_print_tree(BpTreeNode* n, int child, string str, BpTreePrintFn print) {
   if (n != NULL) {
     string s = "";
-    strcpy(s, str);
+    strcpy_s(s, STR, str);
     BpTreeNode_print_page(n, child, s, print);
     for (int i = n->count; i >= 0; --i) {
       if (!n->leaf) {
@@ -334,7 +334,7 @@ void BpTree_node_split(BpTree* t, BpTreeNode* old_node, int left_index, int key,
   int* temp_keys = calloc(t->min, sizeof(int));
   {
     k_prime = BpTree_node_split_allocation(t, old_node, left_index, key, right,
-      new_node, temp_keys, temp_c);
+      new_node, temp_keys, (void**)temp_c);
   }
   free(temp_c);
   free(temp_keys);

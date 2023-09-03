@@ -1,31 +1,7 @@
-build: build_test
+build:
+	clang -g -Iinclude src/algo/*.c src/test.c -o ./test.exe
 
-build_main:
-	cl \
-	/Zi \
-	/EHsc \
-	/W4 \
-	/D_DEBUG \
-	/MDd \
-	/Femain.exe \
-	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\winrt" \
-	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um" \
-	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt" \
-	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared" \
-	/I"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\include" \
-	/Iinclude \
-	src\main.c \
-	src\algo\*.c \
-	/link \
-	/LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64" \
-	/LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\ucrt\x64" \
-	/LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\lib\x64" \
-	user32.lib
-
-run_main:
-	.\main.exe
-
-build_test:
+build_win:
 	cl \
 	/Zi \
 	/EHsc \
@@ -46,7 +22,7 @@ build_test:
 	/LIBPATH:"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.35.32215\lib\x64" \
 	user32.lib
 
-run_test:
+run:
 	.\test.exe
 
 clean:
@@ -55,16 +31,19 @@ clean:
 	del *.pdb \
 	del *.exe
 
-build_test_linux:
+codelldb:
+	C:\Users\alem\.vscode\extensions\vadimcn.vscode-lldb-1.9.2\adapter\codelldb.exe --port 13000
+
+build_linux:
 	clang -g -Wall -Iinclude src/algo/*.c src/test.c -o ./test
 
-run_test_linux:
+run_linux:
 	./test
 
-debug_test_linux:
+debug_linux:
 	lldb ./test
 
-valgrind_test_linux:
+valgrind_linux:
 	valgrind --leak-check=full --track-origins=yes ./test
 
 clean_linux:

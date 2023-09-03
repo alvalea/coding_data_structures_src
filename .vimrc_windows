@@ -1,2 +1,0 @@
-set makeprg=nmake
-set errorformat=%f(%l):%m

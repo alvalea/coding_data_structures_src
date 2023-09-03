@@ -1,1 +1,1 @@
-.nvim.lua_linux
+./.nvim.lua_windows

@@ -462,9 +462,9 @@ void* BTreeNode_find(BTreeNode* n, void* key) {
 
 static
 void BTreeNode_print_page(BTreeNode* n, int child, string str, BTreePrintFn print) {
-  strcat(str, "     ");
+  strcat_s(str, STR, "     ");
   for (int j = 1; j <= child; ++j) {
-    strcat(str, "| ");
+    strcat_s(str, STR, "| ");
   }
   printf("%s", str);
 
@@ -479,7 +479,7 @@ static
 void BTreeNode_print_tree(BTreeNode* n, int child, string str, BTreePrintFn print) {
   if (n != NULL) {
     string s = "";
-    strcpy(s, str);
+    strcpy_s(s, STR, str);
     BTreeNode_print_page(n, child, s, print);
     for (int i = n->count; i >= 0; --i) {
       if (!n->leaf) {

@@ -1,5 +1,6 @@
 #include <algo/container_test.h>
 
+#include <stdio.h>
 #include <algo/container.h>
 
 static
@@ -16,6 +17,10 @@ int test_BpTree_insert() {
       for (int j=50; j>0; --j) {
         BpTree_insert(t, j, &(int){j});
       }
+
+      printf("\n");
+      BpTree_print(t, test_BpTree_print);
+
       for (int j = 50; j > 0; --j) {
         if (j%3== 0) {
           BpTree_remove(t, j);

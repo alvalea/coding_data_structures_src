@@ -400,7 +400,7 @@ void Map_show_trunks(Trunk* t) {
   }
 
   char str[5] = {0};
-  strncpy(str, t->str, strlen(t->str));
+  strncpy_s(str, sizeof(str), t->str, strlen(t->str));
 
   Map_show_trunks(t->prev);
 

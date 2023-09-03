@@ -31,14 +31,16 @@ int test_Map_insert() {
   int result = 0;
   Map* m = new_Map(sizeof(string), sizeof(int), test_Map_compare);
   {
-    int i = 3;
-    string str;
-    sprintf(str, "%d", i);
-    Map_insert(m, str, &i);
-    int* x = (int*)Map_find(m, str);
-    if (*x != i) {
-      result = -1;
+    for (int i=0; i<10; ++i) {
+      string str;
+      sprintf(str, "%d", i);
+      Map_insert(m, str, &i);
+      int* x = (int*)Map_find(m, str);
+      if (*x != i) {
+        result = -1;
+      }
     }
+    Map_print(m, test_Map_print);
   }
   delete_Map(m);
   return result;
