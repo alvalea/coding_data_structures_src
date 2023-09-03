@@ -1,5 +1,7 @@
 vim.opt.makeprg = "make build_linux"
 
+require'lspconfig'.clangd.setup{}
+
 local dap = require('dap')
 dap.adapters.lldb = {
   type = 'executable',
@@ -7,7 +9,7 @@ dap.adapters.lldb = {
   name = 'lldb'
 }
 
-dap.configurations.cpp = {
+dap.configurations.c = {
   {
     name = 'Launch',
     type = 'lldb',
@@ -16,7 +18,7 @@ dap.configurations.cpp = {
       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
     end,
     cwd = '${workspaceFolder}',
-    stopOnEntry = false,
+    stopOnEntry = true,
     args = {},
 
     -- 💀
@@ -33,8 +35,3 @@ dap.configurations.cpp = {
     -- runInTerminal = false,
   },
 }
-
--- If you want to use this for Rust and C, add something like this:
-
-dap.configurations.c = dap.configurations.cpp
-dap.configurations.rust = dap.configurations.cpp
