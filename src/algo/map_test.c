@@ -40,7 +40,7 @@ int test_Map_insert() {
         result = -1;
       }
     }
-    Map_print(m, test_Map_print);
+    //Map_print(m, test_Map_print);
   }
   delete_Map(m);
   return result;

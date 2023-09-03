@@ -18,8 +18,8 @@ int test_BpTree_insert() {
         BpTree_insert(t, j, &(int){j});
       }
 
-      printf("\n");
-      BpTree_print(t, test_BpTree_print);
+      //printf("\n");
+      //BpTree_print(t, test_BpTree_print);
 
       for (int j = 50; j > 0; --j) {
         if (j%3== 0) {

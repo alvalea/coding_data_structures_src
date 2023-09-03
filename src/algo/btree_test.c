@@ -43,8 +43,8 @@ int test_BTree_insert() {
         BTree_insert(t, &v, &v);
       }
 
-      printf("\n");
-      BTree_print(t, test_BTree_print);
+      //printf("\n");
+      //BTree_print(t, test_BTree_print);
 
       for (int j=1; j<=50; ++j) {
         if (j%3== 0) {
