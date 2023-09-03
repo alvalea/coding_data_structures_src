@@ -35,7 +35,7 @@ codelldb:
 	C:\Users\alem\.vscode\extensions\vadimcn.vscode-lldb-1.9.2\adapter\codelldb.exe --port 13000
 
 build_linux:
-	clang -std=c11 -g -Wall -Iinclude src/algo/*.c src/test.c -o ./test
+	clang -std=c11 -g -Iinclude src/algo/*.c src/test.c -o ./test
 
 run_linux:
 	./test

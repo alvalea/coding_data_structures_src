@@ -1,4 +1,4 @@
-vim.opt.makeprg = "make build_test_linux"
+vim.opt.makeprg = "make build_linux"
 
 local dap = require('dap')
 dap.adapters.lldb = {

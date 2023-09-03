@@ -98,9 +98,9 @@ int BpTreeNode_left_index(BpTreeNode* n, BpTreeNode* left) {
 
 static
 void BpTreeNode_print_page(BpTreeNode* n, int child, string str, BpTreePrintFn print) {
-  strcat_s(str, STR, "     ");
+  strcat(str, "     ");
   for (int j = 1; j <= child; ++j) {
-    strcat_s(str, STR, "| ");
+    strcat(str, "| ");
   }
   printf("%s", str);
 
@@ -119,7 +119,7 @@ static
 void BpTreeNode_print_tree(BpTreeNode* n, int child, string str, BpTreePrintFn print) {
   if (n != NULL) {
     string s = "";
-    strcpy_s(s, STR, str);
+    strcpy(s, str);
     BpTreeNode_print_page(n, child, s, print);
     for (int i = n->count; i >= 0; --i) {
       if (!n->leaf) {
