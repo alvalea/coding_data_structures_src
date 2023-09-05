@@ -5,372 +5,372 @@
 #include <string.h>
 
 typedef enum MapNodeColor {
-  BLACK,
-  RED
+        BLACK,
+        RED
 } MapNodeColor;
 
 typedef struct MapNodeKV {
-  void*  key_data;
-  size_t key_size;
-  void*  value_data;
-  size_t value_size;
+        void*  key_data;
+        size_t key_size;
+        void*  value_data;
+        size_t value_size;
 } MapNodeKV;
 
 typedef struct MapNode {
-  struct MapNode* parent;
-  struct MapNode* left;
-  struct MapNode* right;
-  MapNodeColor color;
-  void* key;
-  void* value;
-  size_t key_size;
-  MapCompareFn compare;
+        struct MapNode* parent;
+        struct MapNode* left;
+        struct MapNode* right;
+        MapNodeColor color;
+        void* key;
+        void* value;
+        size_t key_size;
+        MapCompareFn compare;
 } MapNode;
 
 typedef struct Map {
-  size_t key_size;
-  size_t value_size;
-  MapCompareFn compare;
-  MapNode* root;
-  MapNode* NIL;
+        size_t key_size;
+        size_t value_size;
+        MapCompareFn compare;
+        MapNode* root;
+        MapNode* NIL;
 } Map;
 
 static
 MapNode* new_MapNodeNIL(size_t key_size, size_t value_size) {
-  MapNode* n = calloc(1, sizeof(MapNode));
-  n->color = BLACK;
-  n->key = calloc(1, key_size);
-  n->value = calloc(1, value_size);
-  return n;
+        MapNode* n = calloc(1, sizeof(MapNode));
+        n->color = BLACK;
+        n->key = calloc(1, key_size);
+        n->value = calloc(1, value_size);
+        return n;
 }
 
 static
 MapNode* new_MapNode(MapNodeColor color, MapNodeKV* kv, MapCompareFn compare) {
-  MapNode* n = calloc(1, sizeof(MapNode));
-  n->color = color;
+        MapNode* n = calloc(1, sizeof(MapNode));
+        n->color = color;
 
-  n->key = malloc(kv->key_size);
-  memcpy(n->key, kv->key_data, kv->key_size);
+        n->key = malloc(kv->key_size);
+        memcpy(n->key, kv->key_data, kv->key_size);
 
-  n->value = malloc(kv->value_size);
-  memcpy(n->value, kv->value_data, kv->value_size);
+        n->value = malloc(kv->value_size);
+        memcpy(n->value, kv->value_data, kv->value_size);
 
-  n->key_size = kv->key_size;
-  n->compare = compare;
+        n->key_size = kv->key_size;
+        n->compare = compare;
 
-  return n;
+        return n;
 }
 
 static
 void delete_MapNode(MapNode* n, MapNode* nil) {
-  if (n != NULL && n != nil) {
-    delete_MapNode(n->left, nil);
-    delete_MapNode(n->right, nil);
-    free(n->key);
-    free(n->value);
-    free(n);
-  }
+        if (n != NULL && n != nil) {
+                delete_MapNode(n->left, nil);
+                delete_MapNode(n->right, nil);
+                free(n->key);
+                free(n->value);
+                free(n);
+        }
 }
 
 static
 int MapNode_compare(MapNode* n, void* key1, void* key2) {
-  if (n->compare != NULL) {
-    return n->compare(key1, key2);
-  }
-  return memcmp(key1, key2, n->key_size);
+        if (n->compare != NULL) {
+                return n->compare(key1, key2);
+        }
+        return memcmp(key1, key2, n->key_size);
 }
 
 static
 MapNode* MapNode_find(MapNode* n, MapNode* nil, void* key) {
-  MapNode* x = n;
-  while (x != nil) {
-    int cmp = MapNode_compare(n, key, x->key);
-    if (cmp < 0) {
-      x = x->left;
-    } else if (cmp > 0) {
-      x = x->right;
-    } else {
-      break;
-    }
-  }
-  return x;
+        MapNode* x = n;
+        while (x != nil) {
+                int cmp = MapNode_compare(n, key, x->key);
+                if (cmp < 0) {
+                        x = x->left;
+                } else if (cmp > 0) {
+                        x = x->right;
+                } else {
+                        break;
+                }
+        }
+        return x;
 }
 
 static
 void Map_leftRotate(Map* m, MapNode* x) {
-  MapNode* y = x->right;
-  x->right = y->left;
-  if(y->left != m->NIL) {
-    y->left->parent = x;
-  }
-  y->parent = x->parent;
-  if(x->parent == m->NIL) { //x is root
-    m->root = y;
-  }
-  else if(x == x->parent->left) { //x is left child
-    x->parent->left = y;
-  }
-  else { //x is right child
-    x->parent->right = y;
-  }
-  y->left = x;
-  x->parent = y;
+        MapNode* y = x->right;
+        x->right = y->left;
+        if(y->left != m->NIL) {
+                y->left->parent = x;
+        }
+        y->parent = x->parent;
+        if(x->parent == m->NIL) { //x is root
+                m->root = y;
+        }
+        else if(x == x->parent->left) { //x is left child
+                x->parent->left = y;
+        }
+        else { //x is right child
+                x->parent->right = y;
+        }
+        y->left = x;
+        x->parent = y;
 }
 
 static
 void Map_rightRotate(Map* m, MapNode* x) {
-  MapNode* y = x->left;
-  x->left = y->right;
-  if(y->right != m->NIL) {
-    y->right->parent = x;
-  }
-  y->parent = x->parent;
-  if(x->parent == m->NIL) { //x is root
-    m->root = y;
-  }
-  else if(x == x->parent->right) { //x is left child
-    x->parent->right = y;
-  }
-  else { //x is right child
-    x->parent->left = y;
-  }
-  y->right = x;
-  x->parent = y;
+        MapNode* y = x->left;
+        x->left = y->right;
+        if(y->right != m->NIL) {
+                y->right->parent = x;
+        }
+        y->parent = x->parent;
+        if(x->parent == m->NIL) { //x is root
+                m->root = y;
+        }
+        else if(x == x->parent->right) { //x is left child
+                x->parent->right = y;
+        }
+        else { //x is right child
+                x->parent->left = y;
+        }
+        y->right = x;
+        x->parent = y;
 }
 
 void Map_insertFixup(Map* m, MapNode* z) {
-  while(z->parent->color == RED) {
-    if(z->parent == z->parent->parent->left) { //z.parent is the left child
+        while(z->parent->color == RED) {
+                if(z->parent == z->parent->parent->left) { //z.parent is the left child
 
-      MapNode* y = z->parent->parent->right; //uncle of z
+                        MapNode* y = z->parent->parent->right; //uncle of z
 
-      if(y->color == RED) { //case 1
-        z->parent->color = BLACK;
-        y->color = BLACK;
-        z->parent->parent->color = RED;
-        z = z->parent->parent;
-      }
-      else { //case2 or case3
-        if(z == z->parent->right) { //case2
-          z = z->parent; //marked z.parent as new z
-          Map_leftRotate(m, z);
+                        if(y->color == RED) { //case 1
+                                z->parent->color = BLACK;
+                                y->color = BLACK;
+                                z->parent->parent->color = RED;
+                                z = z->parent->parent;
+                        }
+                        else { //case2 or case3
+                                if(z == z->parent->right) { //case2
+                                        z = z->parent; //marked z.parent as new z
+                                        Map_leftRotate(m, z);
+                                }
+                                //case3
+                                z->parent->color = BLACK; //made parent black
+                                z->parent->parent->color = RED; //made parent red
+                                Map_rightRotate(m, z->parent->parent);
+                        }
+                }
+                else { //z.parent is the right child
+                        MapNode* y = z->parent->parent->left; //uncle of z
+
+                        if(y->color == RED) {
+                                z->parent->color = BLACK;
+                                y->color = BLACK;
+                                z->parent->parent->color = RED;
+                                z = z->parent->parent;
+                        }
+                        else {
+                                if(z == z->parent->left) {
+                                        z = z->parent; //marked z.parent as new z
+                                        Map_rightRotate(m, z);
+                                }
+                                z->parent->color = BLACK; //made parent black
+                                z->parent->parent->color = RED; //made parent red
+                                Map_leftRotate(m, z->parent->parent);
+                        }
+                }
         }
-        //case3
-        z->parent->color = BLACK; //made parent black
-        z->parent->parent->color = RED; //made parent red
-        Map_rightRotate(m, z->parent->parent);
-      }
-    }
-    else { //z.parent is the right child
-      MapNode* y = z->parent->parent->left; //uncle of z
-
-      if(y->color == RED) {
-        z->parent->color = BLACK;
-        y->color = BLACK;
-        z->parent->parent->color = RED;
-        z = z->parent->parent;
-      }
-      else {
-        if(z == z->parent->left) {
-          z = z->parent; //marked z.parent as new z
-          Map_rightRotate(m, z);
-        }
-        z->parent->color = BLACK; //made parent black
-        z->parent->parent->color = RED; //made parent red
-        Map_leftRotate(m, z->parent->parent);
-      }
-    }
-  }
-  m->root->color = BLACK;
+        m->root->color = BLACK;
 }
 
 static
 void Map_transplant(Map* m, MapNode* u, MapNode* v) {
-  if(u->parent == m->NIL) {
-    m->root = v;
-  } else if(u == u->parent->left) {
-    u->parent->left = v;
-  } else {
-    u->parent->right = v;
-  }
-  v->parent = u->parent;
+        if(u->parent == m->NIL) {
+                m->root = v;
+        } else if(u == u->parent->left) {
+                u->parent->left = v;
+        } else {
+                u->parent->right = v;
+        }
+        v->parent = u->parent;
 }
 
 static
 MapNode* Map_minimum(Map* m, MapNode* x) {
-  while(x->left != m->NIL) {
-    x = x->left;
-  }
-  return x;
+        while(x->left != m->NIL) {
+                x = x->left;
+        }
+        return x;
 }
 
 static
 void Map_removeFixup(Map* m, MapNode* x) {
-  while(x != m->root && x->color == BLACK) {
-    if(x == x->parent->left) {
-      MapNode* w = x->parent->right;
-      if(w->color == RED) {
-        w->color = BLACK;
-        x->parent->color = RED;
-        Map_leftRotate(m, x->parent);
-        w = x->parent->right;
-      }
-      if(w->left->color == BLACK && w->right->color == BLACK) {
-        w->color = RED;
-        x = x->parent;
-      }
-      else {
-        if(w->right->color == BLACK) {
-          w->left->color = BLACK;
-          w->color = RED;
-          Map_rightRotate(m, w);
-          w = x->parent->right;
+        while(x != m->root && x->color == BLACK) {
+                if(x == x->parent->left) {
+                        MapNode* w = x->parent->right;
+                        if(w->color == RED) {
+                                w->color = BLACK;
+                                x->parent->color = RED;
+                                Map_leftRotate(m, x->parent);
+                                w = x->parent->right;
+                        }
+                        if(w->left->color == BLACK && w->right->color == BLACK) {
+                                w->color = RED;
+                                x = x->parent;
+                        }
+                        else {
+                                if(w->right->color == BLACK) {
+                                        w->left->color = BLACK;
+                                        w->color = RED;
+                                        Map_rightRotate(m, w);
+                                        w = x->parent->right;
+                                }
+                                w->color = x->parent->color;
+                                x->parent->color = BLACK;
+                                w->right->color = BLACK;
+                                Map_leftRotate(m, x->parent);
+                                x = m->root;
+                        }
+                }
+                else {
+                        MapNode* w = x->parent->left;
+                        if(w->color == RED) {
+                                w->color = BLACK;
+                                x->parent->color = RED;
+                                Map_rightRotate(m, x->parent);
+                                w = x->parent->left;
+                        }
+                        if(w->right->color == BLACK && w->left->color == BLACK) {
+                                w->color = RED;
+                                x = x->parent;
+                        }
+                        else {
+                                if(w->left->color == BLACK) {
+                                        w->right->color = BLACK;
+                                        w->color = RED;
+                                        Map_leftRotate(m, w);
+                                        w = x->parent->left;
+                                }
+                                w->color = x->parent->color;
+                                x->parent->color = BLACK;
+                                w->left->color = BLACK;
+                                Map_rightRotate(m, x->parent);
+                                x = m->root;
+                        }
+                }
         }
-        w->color = x->parent->color;
-        x->parent->color = BLACK;
-        w->right->color = BLACK;
-        Map_leftRotate(m, x->parent);
-        x = m->root;
-      }
-    }
-    else {
-      MapNode* w = x->parent->left;
-      if(w->color == RED) {
-        w->color = BLACK;
-        x->parent->color = RED;
-        Map_rightRotate(m, x->parent);
-        w = x->parent->left;
-      }
-      if(w->right->color == BLACK && w->left->color == BLACK) {
-        w->color = RED;
-        x = x->parent;
-      }
-      else {
-        if(w->left->color == BLACK) {
-          w->right->color = BLACK;
-          w->color = RED;
-          Map_leftRotate(m, w);
-          w = x->parent->left;
-        }
-        w->color = x->parent->color;
-        x->parent->color = BLACK;
-        w->left->color = BLACK;
-        Map_rightRotate(m, x->parent);
-        x = m->root;
-      }
-    }
-  }
-  x->color = BLACK;
+        x->color = BLACK;
 }
 
 Map* new_Map(size_t key_size, size_t value_size, MapCompareFn compare) {
-  Map* m = calloc(1, sizeof(Map));
-  m->key_size = key_size;
-  m->value_size = value_size;
-  m->compare = compare;
-  m->NIL = new_MapNodeNIL(key_size, value_size);
-  m->root = m->NIL;
-  return m;
+        Map* m = calloc(1, sizeof(Map));
+        m->key_size = key_size;
+        m->value_size = value_size;
+        m->compare = compare;
+        m->NIL = new_MapNodeNIL(key_size, value_size);
+        m->root = m->NIL;
+        return m;
 }
 
 void delete_Map(Map* m) {
-  delete_MapNode(m->root, m->NIL);
-  free(m->NIL->key);
-  free(m->NIL->value);
-  free(m->NIL);
-  free(m);
+        delete_MapNode(m->root, m->NIL);
+        free(m->NIL->key);
+        free(m->NIL->value);
+        free(m->NIL);
+        free(m);
 }
 
 static
 int Map_compare(Map* m, void* key1, void* key2) {
-  if (m->compare != NULL) {
-    return m->compare(key1, key1);
-  }
-  return memcmp(key1, key2, m->key_size);
+        if (m->compare != NULL) {
+                return m->compare(key1, key1);
+        }
+        return memcmp(key1, key2, m->key_size);
 }
 
 void Map_insert(Map* m, void* key, void* value) {
-  MapNode* z = new_MapNode(RED, &(MapNodeKV){
-      .key_data = key, .key_size = m->key_size,
-      .value_data = value, .value_size = m->value_size
-      }, m->compare);
-  MapNode* y = m->NIL; //variable for the parent of the added node
-  MapNode* x = m->root;
+        MapNode* z = new_MapNode(RED, &(MapNodeKV){
+                        .key_data = key, .key_size = m->key_size,
+                        .value_data = value, .value_size = m->value_size
+                        }, m->compare);
+        MapNode* y = m->NIL; //variable for the parent of the added node
+        MapNode* x = m->root;
 
-  while(x != m->NIL) {
-    y = x;
-    if(Map_compare(m, z->key, x->key) < 0) {
-      x = x->left;
-    } else {
-      x = x->right;
-    }
-  }
-  z->parent = y;
+        while(x != m->NIL) {
+                y = x;
+                if(Map_compare(m, z->key, x->key) < 0) {
+                        x = x->left;
+                } else {
+                        x = x->right;
+                }
+        }
+        z->parent = y;
 
-  if(y == m->NIL) { //newly added node is root
-    m->root = z;
-  }
-  else if(Map_compare(m, z->key, y->key) < 0) { //value of child is less than its parent, left child
-    y->left = z;
-  } else {
-    y->right = z;
-  }
+        if(y == m->NIL) { //newly added node is root
+                m->root = z;
+        }
+        else if(Map_compare(m, z->key, y->key) < 0) { //value of child is less than its parent, left child
+                y->left = z;
+        } else {
+                y->right = z;
+        }
 
-  z->right = m->NIL;
-  z->left = m->NIL;
+        z->right = m->NIL;
+        z->left = m->NIL;
 
-  Map_insertFixup(m, z);
+        Map_insertFixup(m, z);
 }
 
 void Map_remove(Map* m, void* key) {
-  MapNode* z = MapNode_find(m->root, m->NIL, key);
-  if (z == NULL) {
-    return;
-  }
+        MapNode* z = MapNode_find(m->root, m->NIL, key);
+        if (z == NULL) {
+                return;
+        }
 
-  MapNode* y = z;
-  MapNode* x;
-  MapNodeColor y_orignal_color = y->color;
-  if(z->left == m->NIL) {
-    x = z->right;
-    Map_transplant(m, z, z->right);
-  }
-  else if(z->right == m->NIL) {
-    x = z->left;
-    Map_transplant(m, z, z->left);
-  }
-  else {
-    y = Map_minimum(m, z->right);
-    y_orignal_color = y->color;
-    x = y->right;
-    if(y->parent == z) {
-      x->parent = y;
-    }
-    else {
-      Map_transplant(m, y, y->right);
-      y->right = z->right;
-      y->right->parent = y;
-    }
-    Map_transplant(m, z, y);
-    y->left = z->left;
-    y->left->parent = y;
-    y->color = z->color;
-  }
-  if(y_orignal_color == BLACK) {
-    Map_removeFixup(m, x);
-  }
+        MapNode* y = z;
+        MapNode* x;
+        MapNodeColor y_orignal_color = y->color;
+        if(z->left == m->NIL) {
+                x = z->right;
+                Map_transplant(m, z, z->right);
+        }
+        else if(z->right == m->NIL) {
+                x = z->left;
+                Map_transplant(m, z, z->left);
+        }
+        else {
+                y = Map_minimum(m, z->right);
+                y_orignal_color = y->color;
+                x = y->right;
+                if(y->parent == z) {
+                        x->parent = y;
+                }
+                else {
+                        Map_transplant(m, y, y->right);
+                        y->right = z->right;
+                        y->right->parent = y;
+                }
+                Map_transplant(m, z, y);
+                y->left = z->left;
+                y->left->parent = y;
+                y->color = z->color;
+        }
+        if(y_orignal_color == BLACK) {
+                Map_removeFixup(m, x);
+        }
 
-  z->left = NULL;
-  z->right = NULL;
-  delete_MapNode(z, m->NIL);
+        z->left = NULL;
+        z->right = NULL;
+        delete_MapNode(z, m->NIL);
 }
 
 void* Map_find(Map* m, void* key) {
-  MapNode* n = MapNode_find(m->root, m->NIL, key);
-  if (n != m->NIL) {
-    return n->value;
-  }
-  return NULL;
+        MapNode* n = MapNode_find(m->root, m->NIL, key);
+        if (n != m->NIL) {
+                return n->value;
+        }
+        return NULL;
 }
 
 static
@@ -389,67 +389,67 @@ static
 const char LATERAL[] = "   |";
 
 typedef struct Trunk {
-  struct Trunk* prev;
-  const char* str;
+        struct Trunk* prev;
+        const char* str;
 } Trunk;
 
 static
 void Map_show_trunks(Trunk* t) {
-  if (t == NULL) {
-    return;
-  }
+        if (t == NULL) {
+                return;
+        }
 
-  char str[5] = {0};
-  strncpy(str, t->str, strlen(t->str));
+        char str[5] = {0};
+        strncpy(str, t->str, strlen(t->str));
 
-  Map_show_trunks(t->prev);
+        Map_show_trunks(t->prev);
 
-  printf("%s", str);
+        printf("%s", str);
 }
 
 static
 void Map_print_value(MapNode* n, MapPrintFn print) {
-  if (n->color == RED) {
-    printf("\033[0;31m");
-  }
-  print(n->value);
-  printf("\033[0m");
+        if (n->color == RED) {
+                printf("\033[0;31m");
+        }
+        print(n->value);
+        printf("\033[0m");
 }
 
 static
 void Map_print_tree(MapNode* n, Trunk* prev, bool isLeft, MapPrintFn print) {
-  if (n == NULL) {
-    return;
-  }
+        if (n == NULL) {
+                return;
+        }
 
-  const char* prev_str = IDENT;
-  Trunk trunk = { prev, prev_str };
+        const char* prev_str = IDENT;
+        Trunk trunk = { prev, prev_str };
 
-  Map_print_tree(n->right, &trunk, true, print);
+        Map_print_tree(n->right, &trunk, true, print);
 
-  if (!prev) {
-    trunk.str = MIDDLE;
-  } else if (isLeft) {
-    trunk.str = RIGHT;
-    prev_str = LATERAL;
-  } else {
-    trunk.str = LEFT;
-    prev->str = prev_str;
-  }
+        if (!prev) {
+                trunk.str = MIDDLE;
+        } else if (isLeft) {
+                trunk.str = RIGHT;
+                prev_str = LATERAL;
+        } else {
+                trunk.str = LEFT;
+                prev->str = prev_str;
+        }
 
-  Map_show_trunks(&trunk);
-  Map_print_value(n, print);
+        Map_show_trunks(&trunk);
+        Map_print_value(n, print);
 
-  if (prev) {
-    prev->str = prev_str;
-  }
-  trunk.str = LATERAL;
+        if (prev) {
+                prev->str = prev_str;
+        }
+        trunk.str = LATERAL;
 
-  Map_print_tree(n->left, &trunk, false, print);
+        Map_print_tree(n->left, &trunk, false, print);
 }
 
 void Map_print(Map* m, MapPrintFn print) {
-  printf("\n");
-  Map_print_tree(m->root, NULL, false, print);
+        printf("\n");
+        Map_print_tree(m->root, NULL, false, print);
 }
 
