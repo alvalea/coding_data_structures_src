@@ -1,4 +1,4 @@
-build: build_win
+build: build_llvm
 
 build_llvm:
 	clang -g -Iinclude src/*.c test/*.c cmd/testbin/main.c -o ./testbin.exe
@@ -9,7 +9,7 @@ build_win:
 	/EHsc \
 	/D_DEBUG \
 	/MDd \
-	/Fetest.exe \
+	/Fetestbin.exe \
 	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\winrt" \
 	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um" \
 	/I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt" \

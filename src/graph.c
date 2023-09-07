@@ -5,70 +5,81 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+typedef struct Edge {
+        int weight;
+        int vertex;
+} Edge;
+
+typedef struct Vertex {
+        bool visited;
+        Array* edges;
+} Vertex;
+
 struct Graph {
-        int vertices;
-        Array* visited;
-        Array** nodes;
+        Array* vertices;
 };
 
 Graph* new_Graph(int vertices) {
         Graph* g = calloc(1, sizeof(Graph));
-
-        g->vertices = vertices;
-        g->visited = new_Array(sizeof(bool), vertices);
-        for (int i=0; i<g->vertices; ++i) {
-                Array_add(g->visited, &(bool){false});
-        }
-
-        g->nodes = calloc(vertices, sizeof(Array*));
-        for (int i=0; i<g->vertices; ++i) {
-                g->nodes[i] = new_Array(sizeof(int), vertices);
+        
+        g->vertices = new_Array(sizeof(Vertex), vertices);
+        for (int i=0; i<vertices; ++i) {
+                Vertex vertex = {
+                        .visited = false,
+                        .edges = new_Array(sizeof(Edge), vertices)
+                };
+                Array_add(g->vertices, &vertex);
         }
 
         return g;
 }
 
 void delete_Graph(Graph* g) {
-        delete_Array(g->visited);
-        for (int i=0; i<g->vertices; ++i) {
-                delete_Array(g->nodes[i]);
+        size_t len = Array_len(g->vertices);
+        for (int i=0; i<len; ++i) {
+                Vertex* vertex = Array_get(g->vertices, i);
+                delete_Array(vertex->edges);
         }
-        free(g->nodes);
+        delete_Array(g->vertices);
         free(g);
 }
 
 void Graph_add(Graph* g, int src, int dst) {
-        Array_add(g->nodes[src], &dst);
-        Array_add(g->nodes[dst], &src);
+        Vertex* src_vertex = Array_get(g->vertices, src);
+        Edge src_edge = {.weight=1, .vertex=dst};
+        Array_add(src_vertex->edges, &src_edge);
+
+        Vertex* dst_vertex = Array_get(g->vertices, dst);
+        Edge dst_edge = {.weight=1, .vertex=src};
+        Array_add(dst_vertex->edges, &dst_edge);
 }
 
-void Graph_dfs(Graph* g, int vertex) {
-        bool* visited = (bool*)Array_get(g->visited, vertex);
-        *visited = true;
-        printf("Visited %d \n", vertex);
+void Graph_dfs(Graph* g, int i) {
+        Vertex* vertex = Array_get(g->vertices, i);
+        vertex->visited = true;
+        printf("Visited %d \n", i);
 
-        Array* nodes = g->nodes[vertex];
-        size_t len = Array_len(nodes);
-        if (len > 0) {
-                for (size_t j=0; j<len; ++j) {
-                        int* connectedVertex = (int*)Array_get(nodes, j);
-                        bool* conn_visited = (bool*)Array_get(g->visited, *connectedVertex);
-                        if (!*conn_visited) {
-                                Graph_dfs(g, *connectedVertex);
-                        }
+        size_t len = Array_len(vertex->edges);
+        for (size_t j=0; j<len; ++j) {
+                Edge* edge = (Edge*)Array_get(vertex->edges, j);
+                Vertex* conn_vertex = (Vertex*)Array_get(g->vertices, edge->vertex);
+                if (!conn_vertex->visited) {
+                        Graph_dfs(g, edge->vertex);
                 }
         }
 }
 
 void Graph_print(Graph* g, GraphPrintFn print) {
         printf("\n");
-        for (int i = 0; i < g->vertices; ++i) {
-                Array* nodes = g->nodes[i];
-                size_t len = Array_len(nodes);
-                if (len > 0) {
-                        for (size_t j=0; j<len; ++j) {
-                                print(Array_get(nodes, j));
-                        }
+        size_t len_vertices = Array_len(g->vertices);
+        for (int i=0; i<len_vertices; ++i) {
+                Vertex* vertex = Array_get(g->vertices, i);
+                size_t len_edges = Array_len(vertex->edges);
+                for (int j=0; j<len_edges; ++j) {
+                        Edge* edge = (Edge*)Array_get(vertex->edges, j);
+                        print(&edge->vertex);
+                }
+                if (len_edges > 0) {
                         printf("\n");
                 }
         }
