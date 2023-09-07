@@ -32,4 +32,6 @@ int test_BTree_find();
 int test_BpTree_insert();
 int test_BpTree_find();
 
+int test_Graph_add();
+
 #endif

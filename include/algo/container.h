@@ -124,4 +124,17 @@ void* BpTree_find(BpTree* t, int key);
 typedef void (*BpTreePrintFn)(void* value);
 void BpTree_print(BpTree* t, BpTreePrintFn print);
 
+//========================================================
+
+typedef struct Graph Graph;
+
+Graph* new_Graph(int vertices);
+void delete_Graph(Graph* g);
+
+void Graph_add(Graph* g, int src, int dst);
+void Graph_dfs(Graph* g, int vertex);
+
+typedef void (*GraphPrintFn)(void* item);
+void Graph_print(Graph* g, GraphPrintFn print);
+
 #endif

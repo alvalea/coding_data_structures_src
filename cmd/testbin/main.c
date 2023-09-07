@@ -53,6 +53,8 @@ void test_main() {
         test("test_BpTree_insert", test_BpTree_insert);
         test("test_BpTree_find", test_BpTree_find);
 
+        test("test_Graph_add", test_Graph_add);
+
         test("test_quicksort", test_quicksort);
 }
 
