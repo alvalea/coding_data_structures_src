@@ -43,7 +43,7 @@ void delete_Graph(Graph* g) {
         free(g);
 }
 
-void Graph_add_node(Graph* g, void* item) {
+int Graph_add_node(Graph* g, void* item) {
         size_t len = Array_len(g->vertices);
         if (len < g->initial_capacity) {
                 len = g->initial_capacity;
@@ -55,16 +55,14 @@ void Graph_add_node(Graph* g, void* item) {
         vertex.data = malloc(g->item_size);
         memcpy(vertex.data, item, g->item_size);
         Array_add(g->vertices, &vertex);
+
+        return Array_len(g->vertices);
 }
 
 void Graph_add_edge(Graph* g, int src, int dst, int weight) {
         Vertex* src_vertex = Array_get(g->vertices, src);
         Edge src_edge = {.weight=weight, .vertex=dst};
         Array_add(src_vertex->edges, &src_edge);
-
-        Vertex* dst_vertex = Array_get(g->vertices, dst);
-        Edge dst_edge = {.weight=weight, .vertex=src};
-        Array_add(dst_vertex->edges, &dst_edge);
 }
 
 void Graph_dfs(Graph* g, int i, GraphPrintFn print) {

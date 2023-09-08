@@ -134,7 +134,7 @@ void delete_Graph(Graph* g);
 typedef void (*GraphPrintFn)(void* item);
 void Graph_print(Graph* g, GraphPrintFn print);
 
-void Graph_add_node(Graph* g, void* item);
+int Graph_add_node(Graph* g, void* item);
 void Graph_add_edge(Graph* g, int src, int dst, int weight);
 void Graph_dfs(Graph* g, int vertex, GraphPrintFn print);
 

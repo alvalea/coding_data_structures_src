@@ -26,9 +26,16 @@ int test_Graph_add() {
                 }
 
                 Graph_add_edge(g, 0, 1, 1);
+                Graph_add_edge(g, 1, 0, 1);
+
                 Graph_add_edge(g, 0, 2, 1);
+                Graph_add_edge(g, 2, 0, 1);
+
                 Graph_add_edge(g, 1, 2, 1);
+                Graph_add_edge(g, 2, 1, 1);
+
                 Graph_add_edge(g, 2, 3, 1);
+                Graph_add_edge(g, 3, 2, 1);
 
                 Graph_print(g, test_Graph_print);
 
