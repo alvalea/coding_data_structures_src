@@ -1,4 +1,4 @@
-build: build_win
+build: build_llvm
 
 build_llvm:
 	clang -g -Iinclude src/*.c test/*.c cmd/testbin/main.c -o ./testbin.exe

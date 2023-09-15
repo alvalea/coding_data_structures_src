@@ -65,19 +65,45 @@ void Graph_add_edge(Graph* g, int src, int dst, int weight) {
         Array_add(src_vertex->edges, &src_edge);
 }
 
-void Graph_dfs(Graph* g, int i, GraphPrintFn print) {
-        Vertex* vertex = Array_get(g->vertices, i);
-        vertex->visited = true;
-        print(vertex->data);
+void Graph_dfs(Graph* g, int vertex, GraphCallbackFn callback) {
+        Vertex* v = Array_get(g->vertices, vertex);
+        v->visited = true;
+        callback(v->data);
 
-        size_t len = Array_len(vertex->edges);
-        for (size_t j=0; j<len; ++j) {
-                Edge* edge = (Edge*)Array_get(vertex->edges, j);
+        size_t len = Array_len(v->edges);
+        for (size_t i=0; i<len; ++i) {
+                Edge* edge = (Edge*)Array_get(v->edges, i);
                 Vertex* conn_vertex = (Vertex*)Array_get(g->vertices, edge->vertex);
                 if (!conn_vertex->visited) {
-                        Graph_dfs(g, edge->vertex, print);
+                        Graph_dfs(g, edge->vertex, callback);
                 }
         }
+}
+
+void Graph_bfs(Graph* g, int vertex, GraphCallbackFn callback) {
+        Queue* queue = new_Queue(sizeof(int), g->initial_capacity);
+        {
+                Vertex* v = Array_get(g->vertices, vertex);
+                v->visited = true;
+                Queue_push(queue, &vertex);
+
+                int current_vertex = 0;
+                while(Queue_pop(queue, &current_vertex)) {
+                        v = Array_get(g->vertices, current_vertex);
+                        callback(v->data);
+
+                        size_t len = Array_len(v->edges);
+                        for (size_t i=0; i<len; ++i) {
+                                Edge* edge = (Edge*)Array_get(v->edges, i);
+                                Vertex* conn_vertex = (Vertex*)Array_get(g->vertices, edge->vertex);
+                                if (!conn_vertex->visited) {
+                                        conn_vertex->visited = true;
+                                        Queue_push(queue, &edge->vertex);
+                                }
+                        }
+                }
+        }
+        delete_Queue(queue);
 }
 
 void Graph_print(Graph* g, GraphPrintFn print) {
@@ -88,7 +114,7 @@ void Graph_print(Graph* g, GraphPrintFn print) {
                 size_t len_edges = Array_len(vertex->edges);
                 for (int j=0; j<len_edges; ++j) {
                         Edge* edge = (Edge*)Array_get(vertex->edges, j);
-                        print(&edge->vertex);
+                        print(edge->vertex);
                 }
                 if (len_edges > 0) {
                         printf("\n");
