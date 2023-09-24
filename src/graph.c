@@ -65,7 +65,17 @@ void Graph_add_edge(Graph* g, int src, int dst, int weight) {
         Array_add(src_vertex->edges, &src_edge);
 }
 
-void Graph_dfs(Graph* g, int vertex, GraphCallbackFn callback) {
+static
+void Graph_clean(Graph* g) {
+        size_t len = Array_len(g->vertices);
+        for (int i=0; i<len; ++i) {
+                Vertex* v = Array_get(g->vertices, i);
+                v->visited = false;
+        }
+}
+
+static
+void Graph_dfs_loop(Graph* g, int vertex, GraphCallbackFn callback) {
         Vertex* v = Array_get(g->vertices, vertex);
         v->visited = true;
         callback(v->data);
@@ -75,12 +85,20 @@ void Graph_dfs(Graph* g, int vertex, GraphCallbackFn callback) {
                 Edge* edge = (Edge*)Array_get(v->edges, i);
                 Vertex* conn_vertex = (Vertex*)Array_get(g->vertices, edge->vertex);
                 if (!conn_vertex->visited) {
-                        Graph_dfs(g, edge->vertex, callback);
+                        Graph_dfs_loop(g, edge->vertex, callback);
                 }
         }
 }
 
+void Graph_dfs(Graph* g, int vertex, GraphCallbackFn callback) {
+        Graph_clean(g);
+
+        Graph_dfs_loop(g, vertex, callback);
+}
+
 void Graph_bfs(Graph* g, int vertex, GraphCallbackFn callback) {
+        Graph_clean(g);
+
         Queue* queue = new_Queue(sizeof(int), g->initial_capacity);
         {
                 Vertex* v = Array_get(g->vertices, vertex);
