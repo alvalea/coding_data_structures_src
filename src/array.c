@@ -1,7 +1,6 @@
 #include <algo/container.h>
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 
 struct Array {
@@ -15,7 +14,6 @@ Array* new_Array(size_t item_size, size_t capacity) {
         Array* a = calloc(1, sizeof(Array));
 
         if (capacity == 0) {
-                printf("Initial capacity should be higher than zero\n");
                 exit(1);
         }
 
@@ -51,7 +49,6 @@ size_t Array_add(Array* a, void* item) {
 
 void Array_remove(Array* a, size_t index) {
         if (index >= a->len) {
-                printf("Index out of bounds: len %zu, index %zu\n", a->len, index);
                 return;
         }
         size_t n = a->len - 1 - index;
@@ -63,7 +60,6 @@ void Array_remove(Array* a, size_t index) {
 
 void* Array_get(Array* a, size_t index) {
         if (index >= a->len) {
-                printf("Index out of bounds: len %zu, index %zu\n", a->len, index);
                 return NULL;
         }
         size_t offset = index * a->item_size;

@@ -82,3 +82,40 @@ int test_Graph_bfs() {
         int result = test_Graph_search(Graph_bfs);
         return result;
 }
+
+int test_Graph_mst() {
+        int result = 0;
+        Graph* g = new_Graph(sizeof(Value), 10);
+        {
+                for (int i=0; i<5; ++i) {
+                        Graph_add_node(g, &(Value){.number=i*2});
+                }
+
+                Graph_add_edge(g, 0, 1, 2);
+                Graph_add_edge(g, 0, 3, 6);
+
+                Graph_add_edge(g, 1, 0, 2);
+                Graph_add_edge(g, 1, 2, 3);
+                Graph_add_edge(g, 1, 3, 8);
+                Graph_add_edge(g, 1, 4, 5);
+
+                Graph_add_edge(g, 2, 1, 3);
+                Graph_add_edge(g, 2, 4, 7);
+
+                Graph_add_edge(g, 3, 0, 6);
+                Graph_add_edge(g, 3, 1, 8);
+                Graph_add_edge(g, 3, 4, 9);
+
+                Graph_add_edge(g, 4, 1, 5);
+                Graph_add_edge(g, 4, 2, 7);
+                Graph_add_edge(g, 4, 3, 9);
+
+                Graph_print(g, test_print_int);
+
+                Graph_mst(g);
+
+                Graph_print(g, test_print_int);
+        }
+        delete_Graph(g);
+        return result;
+}

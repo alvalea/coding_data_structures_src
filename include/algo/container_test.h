@@ -35,5 +35,6 @@ int test_BpTree_find();
 int test_Graph_print();
 int test_Graph_dfs();
 int test_Graph_bfs();
+int test_Graph_mst();
 
 #endif

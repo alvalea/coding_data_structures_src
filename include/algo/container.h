@@ -131,6 +131,9 @@ typedef struct Graph Graph;
 Graph* new_Graph(size_t item_size, size_t initial_capacity);
 void delete_Graph(Graph* g);
 
+typedef void (*GraphPrintFn)(int vertex);
+void Graph_print(Graph* g, GraphPrintFn print);
+
 int Graph_add_node(Graph* g, void* item);
 void Graph_add_edge(Graph* g, int src, int dst, int weight);
 
@@ -138,7 +141,6 @@ typedef void (*GraphCallbackFn)(void* item);
 void Graph_dfs(Graph* g, int vertex, GraphCallbackFn callback);
 void Graph_bfs(Graph* g, int vertex, GraphCallbackFn callback);
 
-typedef void (*GraphPrintFn)(int vertex);
-void Graph_print(Graph* g, GraphPrintFn print);
+void Graph_mst(Graph* g);
 
 #endif

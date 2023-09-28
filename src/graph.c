@@ -6,12 +6,13 @@
 #include <stdbool.h>
 
 typedef struct Edge {
+        bool selected;
         int weight;
         int vertex;
 } Edge;
 
 typedef struct Vertex {
-        bool visited;
+        bool selected;
         void* data;
         Array* edges;
 } Vertex;
@@ -49,7 +50,7 @@ int Graph_add_node(Graph* g, void* item) {
                 len = g->initial_capacity;
         }
         Vertex vertex = {
-                .visited = false,
+                .selected = false,
                 .edges = new_Array(sizeof(Edge), len)
         };
         vertex.data = malloc(g->item_size);
@@ -70,56 +71,82 @@ void Graph_clean(Graph* g) {
         size_t len = Array_len(g->vertices);
         for (int i=0; i<len; ++i) {
                 Vertex* v = Array_get(g->vertices, i);
-                v->visited = false;
+                v->selected = false;
+
+                size_t len = Array_len(v->edges);
+                for (int j=0; j<len; ++j) {
+                        Edge* edge = Array_get(v->edges, j);
+                        edge->selected = false;
+                }
         }
 }
 
 static
 void Graph_dfs_loop(Graph* g, int vertex, GraphCallbackFn callback) {
         Vertex* v = Array_get(g->vertices, vertex);
-        v->visited = true;
+        v->selected = true;
         callback(v->data);
 
         size_t len = Array_len(v->edges);
-        for (size_t i=0; i<len; ++i) {
-                Edge* edge = (Edge*)Array_get(v->edges, i);
-                Vertex* conn_vertex = (Vertex*)Array_get(g->vertices, edge->vertex);
-                if (!conn_vertex->visited) {
+        for (int i=0; i<len; ++i) {
+                Edge* edge = Array_get(v->edges, i);
+                Vertex* conn_vertex = Array_get(g->vertices, edge->vertex);
+                if (!conn_vertex->selected) {
                         Graph_dfs_loop(g, edge->vertex, callback);
                 }
         }
 }
 
+// Input:
+//        A
+//       / \
+//      B   C
+//     /   / \
+//    D   E   F
+// Output:
+// A, B, D, C, E, F
 void Graph_dfs(Graph* g, int vertex, GraphCallbackFn callback) {
         Graph_clean(g);
 
         Graph_dfs_loop(g, vertex, callback);
 }
 
+static
+void Graph_bfs_loop(Graph* g, Queue* queue, GraphCallbackFn callback) {
+        int current_vertex = 0;
+        while(Queue_pop(queue, &current_vertex)) {
+                Vertex* v = Array_get(g->vertices, current_vertex);
+                callback(v->data);
+
+                size_t len = Array_len(v->edges);
+                for (int i=0; i<len; ++i) {
+                        Edge* edge = Array_get(v->edges, i);
+                        Vertex* conn_vertex = Array_get(g->vertices, edge->vertex);
+                        if (!conn_vertex->selected) {
+                                conn_vertex->selected = true;
+                                Queue_push(queue, &edge->vertex);
+                        }
+                }
+        }
+}
+
+// Input:
+//        A
+//       / \
+//      B   C
+//     /   / \
+//    D   E   F
+// Output:
+// A, B, C, D, E, F
 void Graph_bfs(Graph* g, int vertex, GraphCallbackFn callback) {
         Graph_clean(g);
 
         Queue* queue = new_Queue(sizeof(int), g->initial_capacity);
         {
                 Vertex* v = Array_get(g->vertices, vertex);
-                v->visited = true;
+                v->selected = true;
                 Queue_push(queue, &vertex);
-
-                int current_vertex = 0;
-                while(Queue_pop(queue, &current_vertex)) {
-                        v = Array_get(g->vertices, current_vertex);
-                        callback(v->data);
-
-                        size_t len = Array_len(v->edges);
-                        for (size_t i=0; i<len; ++i) {
-                                Edge* edge = (Edge*)Array_get(v->edges, i);
-                                Vertex* conn_vertex = (Vertex*)Array_get(g->vertices, edge->vertex);
-                                if (!conn_vertex->visited) {
-                                        conn_vertex->visited = true;
-                                        Queue_push(queue, &edge->vertex);
-                                }
-                        }
-                }
+                Graph_bfs_loop(g, queue, callback);
         }
         delete_Queue(queue);
 }
@@ -129,13 +156,83 @@ void Graph_print(Graph* g, GraphPrintFn print) {
         size_t len_vertices = Array_len(g->vertices);
         for (int i=0; i<len_vertices; ++i) {
                 Vertex* vertex = Array_get(g->vertices, i);
-                size_t len_edges = Array_len(vertex->edges);
-                for (int j=0; j<len_edges; ++j) {
-                        Edge* edge = (Edge*)Array_get(vertex->edges, j);
-                        print(edge->vertex);
+
+                for (int j=0, e=0; j<len_vertices; ++j) {
+                        Edge* edge = Array_get(vertex->edges, e);
+                        if (edge && (edge->vertex == j)) {
+                                print(edge->weight);
+                                ++e;
+                        } else {
+                                print(0);
+                        }
                 }
-                if (len_edges > 0) {
-                        printf("\n");
+                printf("\n");
+        }
+}
+
+static
+void Graph_mst_prune(Graph* g) {
+        size_t len = Array_len(g->vertices);
+        for (int i=0; i<len; ++i) {
+                Vertex* vertex = Array_get(g->vertices, i);
+                size_t len_edges = Array_len(vertex->edges);
+                for (int j=len_edges-1; j>=0; --j) {
+                        Edge* edge = Array_get(vertex->edges, j);
+                        if (edge && !edge->selected) {
+                                Array_remove(vertex->edges, j);
+                        }
                 }
         }
+}
+
+typedef struct SelectedEdge {
+        int vertex;
+        int edge_index;
+} SelectedEdge;
+
+static
+SelectedEdge Graph_mst_min_weight(Graph* g) {
+        SelectedEdge selected_edge;
+
+        int min = INT_MAX;
+        size_t len = Array_len(g->vertices);
+        for (int i=0; i<len; ++i) {
+                Vertex* src_vertex = Array_get(g->vertices, i);
+                if (src_vertex->selected) {
+                        size_t len_edges = Array_len(src_vertex->edges);
+                        for (int j=0; j<len_edges; ++j) {
+                                Edge* edge = Array_get(src_vertex->edges, j);
+                                if (edge != NULL) {
+                                        Vertex* dst_vertex = Array_get(g->vertices, edge->vertex);
+                                        if (!dst_vertex->selected && min > edge->weight) {
+                                                min = edge->weight;
+                                                selected_edge.vertex = i;
+                                                selected_edge.edge_index = j;
+                                        }
+                                }
+                        }
+                }
+        }
+        return selected_edge;
+}
+
+void Graph_mst(Graph* g) {
+        Graph_clean(g);
+
+        Vertex* vertex = Array_get(g->vertices, 0);
+        vertex->selected = true;
+
+        size_t len = Array_len(g->vertices);
+        for (int v=0; v<len-1; ++v) {
+                SelectedEdge selected_edge = Graph_mst_min_weight(g);
+
+                vertex = Array_get(g->vertices, selected_edge.vertex);
+
+                Edge* edge = Array_get(vertex->edges, selected_edge.edge_index);
+                edge->selected = true;
+                vertex = Array_get(g->vertices, edge->vertex);
+                vertex->selected = true;
+        }
+
+        Graph_mst_prune(g);
 }
