@@ -8,7 +8,8 @@
 typedef struct Edge {
         bool selected;
         int weight;
-        int vertex;
+        int src;
+        int dst;
 } Edge;
 
 typedef struct Vertex {
@@ -62,7 +63,7 @@ int Graph_add_node(Graph* g, void* item) {
 
 void Graph_add_edge(Graph* g, int src, int dst, int weight) {
         Vertex* src_vertex = Array_get(g->vertices, src);
-        Edge src_edge = {.weight=weight, .vertex=dst};
+        Edge src_edge = {.weight=weight, .src=src, .dst=dst};
         Array_add(src_vertex->edges, &src_edge);
 }
 
@@ -90,9 +91,9 @@ void Graph_dfs_loop(Graph* g, int vertex, GraphCallbackFn callback) {
         size_t len = Array_len(v->edges);
         for (int i=0; i<len; ++i) {
                 Edge* edge = Array_get(v->edges, i);
-                Vertex* conn_vertex = Array_get(g->vertices, edge->vertex);
+                Vertex* conn_vertex = Array_get(g->vertices, edge->dst);
                 if (!conn_vertex->selected) {
-                        Graph_dfs_loop(g, edge->vertex, callback);
+                        Graph_dfs_loop(g, edge->dst, callback);
                 }
         }
 }
@@ -121,10 +122,10 @@ void Graph_bfs_loop(Graph* g, Queue* queue, GraphCallbackFn callback) {
                 size_t len = Array_len(v->edges);
                 for (int i=0; i<len; ++i) {
                         Edge* edge = Array_get(v->edges, i);
-                        Vertex* conn_vertex = Array_get(g->vertices, edge->vertex);
+                        Vertex* conn_vertex = Array_get(g->vertices, edge->dst);
                         if (!conn_vertex->selected) {
                                 conn_vertex->selected = true;
-                                Queue_push(queue, &edge->vertex);
+                                Queue_push(queue, &edge->dst);
                         }
                 }
         }
@@ -159,7 +160,7 @@ void Graph_print(Graph* g, GraphPrintFn print) {
 
                 for (int j=0, e=0; j<len_vertices; ++j) {
                         Edge* edge = Array_get(vertex->edges, e);
-                        if (edge && (edge->vertex == j)) {
+                        if (edge && (edge->dst == j)) {
                                 print(edge->weight);
                                 ++e;
                         } else {
@@ -167,6 +168,23 @@ void Graph_print(Graph* g, GraphPrintFn print) {
                         }
                 }
                 printf("\n");
+        }
+}
+
+static
+void Graph_mst_select_edges(Graph* g, Array* mst) {
+        size_t len = Array_len(mst);
+        for (int i=1; i<len; ++i) {
+                Edge* selected_edge = Array_get(mst, i);
+
+                Vertex* vertex = Array_get(g->vertices, selected_edge->src);
+                size_t len_edges = Array_len(vertex->edges);
+                for (int j=0; j<len_edges; ++j) {
+                        Edge* edge = Array_get(vertex->edges, j);
+                        if (edge->dst == selected_edge->dst) {
+                                edge->selected = true;
+                        }
+                }
         }
 }
 
@@ -185,54 +203,67 @@ void Graph_mst_prune(Graph* g) {
         }
 }
 
-typedef struct SelectedEdge {
-        int vertex;
-        int edge_index;
-} SelectedEdge;
-
 static
-SelectedEdge Graph_mst_min_weight(Graph* g) {
-        SelectedEdge selected_edge;
-
+Edge* Graph_mst_min_edge(Graph* g, Array* mst, int len) {
+        int min_index = -1;
         int min = INT_MAX;
-        size_t len = Array_len(g->vertices);
         for (int i=0; i<len; ++i) {
-                Vertex* src_vertex = Array_get(g->vertices, i);
-                if (src_vertex->selected) {
-                        size_t len_edges = Array_len(src_vertex->edges);
-                        for (int j=0; j<len_edges; ++j) {
-                                Edge* edge = Array_get(src_vertex->edges, j);
-                                if (edge != NULL) {
-                                        Vertex* dst_vertex = Array_get(g->vertices, edge->vertex);
-                                        if (!dst_vertex->selected && min > edge->weight) {
-                                                min = edge->weight;
-                                                selected_edge.vertex = i;
-                                                selected_edge.edge_index = j;
-                                        }
-                                }
-                        }
+                Edge* edge = Array_get(mst, i);
+                if (!edge->selected && edge->weight < min) {
+                        min = edge->weight;
+                        min_index = edge->dst;
                 }
         }
-        return selected_edge;
+        Edge* edge = Array_get(mst, min_index);
+        edge->selected = true;
+
+        return edge;
+}
+
+static
+void Graph_mst_init(Graph* g, Array* mst) {
+        size_t len = Array_len(g->vertices);
+        for (int i=0; i<len; ++i) {
+                Array_add(mst, &(Edge){.weight=INT_MAX});
+        }
+        Edge* e = Array_get(mst, 0);
+        e->weight = 0;
+        e->src = -1;
+}
+
+static
+void Graph_mst_update_edges(Graph* g, Array* mst, Vertex* vertex) {
+        size_t len = Array_len(g->vertices);
+        for (int j=0, v=0; v<len; ++v) {
+                Edge* mst_edge = Array_get(mst, v);
+                Edge* vertex_edge = Array_get(vertex->edges, j);
+                if ( vertex_edge && vertex_edge->dst == v) {
+                        if (!mst_edge->selected &&
+                            mst_edge->weight > vertex_edge->weight) {
+                                mst_edge->src = vertex_edge->src;
+                                mst_edge->dst = vertex_edge->dst;
+                                mst_edge->weight = vertex_edge->weight;
+                        }
+                        ++j;
+                }
+        }
 }
 
 void Graph_mst(Graph* g) {
         Graph_clean(g);
 
-        Vertex* vertex = Array_get(g->vertices, 0);
-        vertex->selected = true;
-
         size_t len = Array_len(g->vertices);
-        for (int v=0; v<len-1; ++v) {
-                SelectedEdge selected_edge = Graph_mst_min_weight(g);
+        Array* mst = new_Array(sizeof(Edge), len);
+        {
+                Graph_mst_init(g, mst);
 
-                vertex = Array_get(g->vertices, selected_edge.vertex);
-
-                Edge* edge = Array_get(vertex->edges, selected_edge.edge_index);
-                edge->selected = true;
-                vertex = Array_get(g->vertices, edge->vertex);
-                vertex->selected = true;
+                for (int i=0; i<len-1; ++i) {
+                        Edge* edge = Graph_mst_min_edge(g, mst, len);
+                        Vertex* vertex = Array_get(g->vertices, edge->dst);
+                        Graph_mst_update_edges(g, mst, vertex);
+                }
+                Graph_mst_select_edges(g, mst);
+                Graph_mst_prune(g);
         }
-
-        Graph_mst_prune(g);
+        delete_Array(mst);
 }
