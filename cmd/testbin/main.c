@@ -57,6 +57,7 @@ void test_main() {
         test("test_Graph_bfs", test_Graph_bfs);
         test("test_Graph_dfs", test_Graph_dfs);
         test("test_Graph_mst", test_Graph_mst);
+        test("test_Graph_path", test_Graph_path);
 
         test("test_quicksort", test_quicksort);
 }
