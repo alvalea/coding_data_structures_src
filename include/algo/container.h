@@ -71,7 +71,8 @@ void Map_print(Map* m, MapPrintFn print);
 typedef struct HashMap HashMap;
 
 typedef bool (*HashMapEqualFn)(void* key1, void* key2);
-HashMap* new_HashMap(size_t key_size, size_t value_size, HashMapEqualFn equal);
+HashMap* new_HashMap(size_t key_size, size_t value_size, size_t capacity,
+                HashMapEqualFn equal);
 void delete_HashMap(HashMap* m);
 
 void HashMap_insert(HashMap* m, void* key, void* value);

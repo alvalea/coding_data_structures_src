@@ -4,32 +4,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-static
-const int CAPACITY = 32;
-
 struct HashMap {
-        size_t capacity;
         size_t key_size;
         size_t value_size;
-        List** buckets;
+        size_t capacity;
+        Array* buckets;
         HashMapEqualFn equal;
 };
 
-HashMap* new_HashMap(size_t key_size, size_t value_size, HashMapEqualFn equal) {
+HashMap* new_HashMap(size_t key_size, size_t value_size, size_t capacity,
+                HashMapEqualFn equal) {
         HashMap* m = calloc(1, sizeof(HashMap));
-        m->capacity = CAPACITY;
         m->key_size = key_size;
         m->value_size = value_size;
-        m->buckets = calloc(m->capacity, sizeof(List*));
+        m->capacity = capacity;
+        m->buckets = new_Array(sizeof(List*), m->capacity);
+        for (int i=0; i<m->capacity; ++i) {
+                List* bucket = new_List(m->key_size + m->value_size);
+                Array_add(m->buckets, &bucket);
+        }
         m->equal = equal;
         return m;
 }
 
 void delete_HashMap(HashMap* m) {
         for (int i=0; i<m->capacity; ++i) {
-                if (m->buckets[i] != NULL) {
-                        delete_List(m->buckets[i]);
-                }
+                List* bucket = *(List**)Array_get(m->buckets, i);
+                delete_List(bucket);
         }
         free(m->buckets);
         free(m);
@@ -51,16 +52,15 @@ void HashMap_insert_item(HashMap* m, int hash, void* key, void* value) {
         {
                 memcpy(item, key, m->key_size);
                 memcpy(item + m->key_size, value, m->value_size);
-                List_add(m->buckets[hash], item);
+
+                List* bucket = *(List**)Array_get(m->buckets, hash);
+                List_add(bucket, item);
         }
         free(item);
 }
 
 void HashMap_insert(HashMap* m, void* key, void* value) {
         int hash = HashMap_hash(m, key);
-        if (m->buckets[hash] == NULL) {
-                m->buckets[hash] = new_List(m->key_size + m->value_size);
-        }
         HashMap_insert_item(m, hash, key, value);
 }
 
@@ -74,46 +74,43 @@ bool HashMap_equal(HashMap* m, void* key1, void* key2) {
 
 void HashMap_remove(HashMap* m, void* key) {
         int hash = HashMap_hash(m, key);
-        if (m->buckets[hash] != NULL) {
-                ListNode* n = List_head(m->buckets[hash]);
-                while (n) {
-                        void* item = ListNode_data(n);
-                        if (HashMap_equal(m, item, key)) {
-                                List_remove(m->buckets[hash], item);
-                                return;
-                        }
-                        n = ListNode_next(n);
+        List* bucket = *(List**)Array_get(m->buckets, hash);
+        ListNode* n = List_head(bucket);
+        while (n) {
+                void* item = ListNode_data(n);
+                if (HashMap_equal(m, item, key)) {
+                        List_remove(bucket, item);
+                        return;
                 }
+                n = ListNode_next(n);
         }
 }
 
 void* HashMap_find(HashMap* m, void* key) {
         int hash = HashMap_hash(m, key);
-        if (m->buckets[hash] != NULL) {
-                ListNode* n = List_head(m->buckets[hash]);
-                while (n) {
-                        void* item = ListNode_data(n);
-                        if (HashMap_equal(m, item, key)) {
-                                return (char*)item + m->key_size;
-                        }
-                        n = ListNode_next(n);
+        List* bucket = *(List**)Array_get(m->buckets, hash);
+        ListNode* n = List_head(bucket);
+        while (n) {
+                void* item = ListNode_data(n);
+                if (HashMap_equal(m, item, key)) {
+                        return (char*)item + m->key_size;
                 }
+                n = ListNode_next(n);
         }
         return NULL;
 }
 
 void HashMap_print(HashMap* m, HashMapPrintFn print) {
         for (int i=0; i<m->capacity; ++i) {
-                if (m->buckets[i] != NULL) {
-                        printf("[%d] ", i);
-                        ListNode* n = List_head(m->buckets[i]);
-                        while (n) {
-                                void* item = ListNode_data(n);
-                                print(item);
-                                printf(" -> ");
-                                n = ListNode_next(n);
-                        }
-                        printf("\n");
+                printf("[%d] ", i);
+                List* bucket = *(List**)Array_get(m->buckets, i);
+                ListNode* n = List_head(bucket);
+                while (n) {
+                        void* item = ListNode_data(n);
+                        print(item);
+                        printf(" -> ");
+                        n = ListNode_next(n);
                 }
+                printf("\n");
         }
 }
