@@ -5,6 +5,10 @@
 
 typedef struct Value {
         int number;
+        int number1;
+        int number2;
+        int number3;
+        int number4;
 } Value;
 
 static
@@ -125,8 +129,8 @@ void test_graph_shortest_path(int weight, Array* path) {
         printf("weight: %d\n", weight);
         size_t len = Array_len(path);
         for (int i=0; i<len; ++i) {
-                Value* v = Array_get(path, i);
-                printf("%d -> ", v->number);
+                Value* v = *(Value**)Array_get(path, i);
+                printf("%d -> ", v->number4);
         }
         printf("\n");
 }
@@ -136,7 +140,14 @@ int test_Graph_path() {
         Graph* g = new_Graph(sizeof(Value), 10);
         {
                 for (int i=0; i<5; ++i) {
-                        Graph_add_node(g, &(Value){.number=i});
+                        Graph_add_node(g, 
+                                        &(Value){
+                                        .number=i,
+                                        .number1=i,
+                                        .number2=i,
+                                        .number3=i,
+                                        .number4=i,
+                                        });
                 }
 
                 Graph_add_edge(g, 0, 1, 2);

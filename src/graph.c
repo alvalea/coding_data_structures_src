@@ -279,7 +279,7 @@ void Graph_path_vertices(Graph* g, int vertex, Array* path, Array* vertices) {
         Graph_path_vertices(g, edge->src, path, vertices);
 
         Vertex* v = Array_get(g->vertices, vertex);
-        Array_add(vertices, v->data);
+        Array_add(vertices, &v->data);
 }
 
 static
