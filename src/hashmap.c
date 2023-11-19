@@ -32,7 +32,7 @@ void delete_HashMap(HashMap* m) {
                 List* bucket = *(List**)Array_get(m->buckets, i);
                 delete_List(bucket);
         }
-        free(m->buckets);
+        delete_Array(m->buckets);
         free(m);
 }
 
