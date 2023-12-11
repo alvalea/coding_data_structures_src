@@ -1,24 +1,22 @@
 vim.opt.makeprg = "nmake"
 
-require'lspconfig'.clangd.setup{}
+require 'lspconfig'.clangd.setup{}
 
--- INFO: Run in another terminal
--- C:\Users\alem\.vscode\extensions\vadimcn.vscode-lldb-1.9.2\adapter\codelldb.exe --port 13000
 local dap = require('dap')
 dap.adapters.codelldb = {
     type = 'server',
-    host = '127.0.0.1',
-    port = 13000
+    port = "${port}",
+    executable = {
+            command = "C:\\Users\\alem\\.vscode\\extensions\\vadimcn.vscode-lldb-1.10.0\\adapter\\codelldb.exe",
+            args = { "--port", "${port}" },
+    },
 }
 
 dap.configurations.c = {
     {
         type = 'codelldb',
         request = 'launch',
-        program = function()
-            return vim.fn.input('Path to executable: ', vim.fn.getcwd()..'/', 'file')
-        end,
-        --program = '${fileDirname}/${fileBasenameNoExtension}',
+        program = '${workspaceFolder}/testbin.exe',
         cwd = '${workspaceFolder}',
         terminal = 'integrated'
     }

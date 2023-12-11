@@ -16,9 +16,6 @@ clean:
 	del *.pdb \
 	del *.exe
 
-codelldb:
-	C:\Users\alem\.vscode\extensions\vadimcn.vscode-lldb-1.9.2\adapter\codelldb.exe --port 13000
-
 build_linux:
 	clang -Iinclude src/*.c test/*.c cmd/testbin/main.c -o ./testbin
 
