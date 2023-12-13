@@ -3,21 +3,22 @@ vim.opt.makeprg = "nmake"
 require 'lspconfig'.clangd.setup{}
 
 local dap = require('dap')
-dap.adapters.codelldb = {
-    type = 'server',
-    port = "${port}",
-    executable = {
-            command = "C:\\Users\\alem\\.vscode\\extensions\\vadimcn.vscode-lldb-1.10.0\\adapter\\codelldb.exe",
-            args = { "--port", "${port}" },
-    },
+dap.adapters.lldb = {
+  type = 'executable',
+  command = 'C:\\Program Files\\LLVM\\bin\\lldb-vscode.exe', -- adjust as needed, must be absolute path
+  name = 'lldb'
 }
 
 dap.configurations.c = {
-    {
-        type = 'codelldb',
-        request = 'launch',
-        program = '${workspaceFolder}/testbin.exe',
-        cwd = '${workspaceFolder}',
-        terminal = 'integrated'
-    }
+  {
+    name = 'Launch',
+    type = 'lldb',
+    request = 'launch',
+    program = '${workspaceFolder}/testbin.exe',
+    cwd = '${workspaceFolder}',
+    stopOnEntry = false,
+    args = {},
+  },
 }
+
+
