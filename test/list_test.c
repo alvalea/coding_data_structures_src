@@ -3,21 +3,34 @@
 #include <stdio.h>
 #include <algo/container.h>
 
+typedef struct Value {
+        int number;
+} Value;
+
 static
 void test_List_print(void* item) {
-        int* i = (int*)item;
-        printf("%d ", *i);
+        Value* v = (Value*)item;
+        printf("%d ", v->number);
 }
 
 int test_List_add() {
         int result = 0;
-        List* l = new_List(sizeof(int));
+        List* l = new_List(sizeof(Value));
         {
-                int i = 3;
-                int* x = List_add(l, &i);
-                if (*x != i) {
-                        result = -1;
+                for (int i=1; i<=20; ++i) {
+                        List_add(l, &(Value){ .number = i});
                 }
+
+                ListNode* n = List_head(l);
+                while (n) {
+                        Value* v = ListNode_data(n);
+                        if (v->number % 2) {
+                                List_remove(l, v);
+                        }
+                        n = ListNode_next(n);
+                }
+
+                List_print(l, test_List_print);
         }
         delete_List(l);
         return result;

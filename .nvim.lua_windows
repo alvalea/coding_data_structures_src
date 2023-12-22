@@ -1,4 +1,5 @@
 vim.opt.makeprg = "nmake"
+vim.opt.wildignore = "*.obj,*.tlog,*.pdb,*.ilk,*.exe"
 
 require 'lspconfig'.clangd.setup{}
 
