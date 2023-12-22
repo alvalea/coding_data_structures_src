@@ -107,7 +107,8 @@ void HashMap_print(HashMap* m, HashMapPrintFn print) {
                 ListNode* n = List_head(bucket);
                 while (n) {
                         void* item = ListNode_data(n);
-                        print(item);
+                        char* value = (char*)item + m->key_size;
+                        print(value);
                         printf(" -> ");
                         n = ListNode_next(n);
                 }
