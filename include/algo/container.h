@@ -79,7 +79,7 @@ void HashMap_insert(HashMap* m, void* key, void* value);
 void HashMap_remove(HashMap* m, void* key);
 void* HashMap_find(HashMap* m, void* key);
 
-typedef void (*HashMapPrintFn)(void* value);
+typedef void (*HashMapPrintFn)(void* key, void* value);
 void HashMap_print(HashMap* m, HashMapPrintFn print);
 
 //========================================================

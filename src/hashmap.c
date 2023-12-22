@@ -108,7 +108,7 @@ void HashMap_print(HashMap* m, HashMapPrintFn print) {
                 while (n) {
                         void* item = ListNode_data(n);
                         char* value = (char*)item + m->key_size;
-                        print(value);
+                        print(item, value);
                         printf(" -> ");
                         n = ListNode_next(n);
                 }
