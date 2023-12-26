@@ -8,17 +8,21 @@
 
 typedef char string[STR];
 
+typedef struct Value {
+        int number;
+} Value;
+
 static
 void test_Heap_print(void* item) {
-        int* i = (int*)item;
-        printf("%d ",*i);
+        Value* v = (Value*)item;
+        printf("%d ", v->number);
 }
 
 static
 bool test_Heap_bigger_int(void* item1, void* item2) {
-        int* i1 = (int*)item1;
-        int* i2 = (int*)item2;
-        return *i1 > *i2;
+        Value* v1 = (Value*)item1;
+        Value* v2 = (Value*)item2;
+        return v1->number > v2->number;
 }
 
 static
@@ -33,16 +37,31 @@ int test_Heap_push() {
         int n = 10;
         Heap* h = new_Heap(sizeof(int), n, test_Heap_bigger_int);
         {
+                printf("\n");
                 for (int i = 1; i<=n; ++i) {
-                        Heap_push(h, &i);
+                        Heap_push(h, &(Value){ .number = i });
                 }
-                for (int i = n; i>0; --i) {
-                        int x;
-                        Heap_pop(h, &x);
-                        if (x != i) {
-                                result = -1;
-                        }
+                Heap_print(h, test_Heap_print);
+                //               10
+                //              / \
+                //             9   6
+                //            / \  /\
+                //          7   8 2  5
+                //         /\  /
+                //        1 4 3
+
+                printf("\n");
+                for (int i = n/2; i>0; --i) {
+                        Value v;
+                        Heap_pop(h, &v);
                 }
+                Heap_print(h, test_Heap_print);
+                //              5
+                //             /\
+                //            4 2
+                //           /\
+                //          1 3
+                printf("\n");
         }
         delete_Heap(h);
         return result;
