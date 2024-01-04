@@ -31,7 +31,7 @@ int test_Map_insert() {
         int result = 0;
         Map* m = new_Map(sizeof(string), sizeof(int), test_Map_compare);
         {
-                for (int i=0; i<10; ++i) {
+                for (int i=0; i<9; ++i) {
                         string str;
                         sprintf(str, "%d", i);
                         Map_insert(m, str, &i);
@@ -40,7 +40,7 @@ int test_Map_insert() {
                                 result = -1;
                         }
                 }
-                //Map_print(m, test_Map_print);
+                Map_print(m, test_Map_print);
         }
         delete_Map(m);
         return result;

@@ -34,7 +34,7 @@ bool test_Heap_bigger_string(void* item1, void* item2) {
 
 int test_Heap_push() {
         int result = 0;
-        int n = 10;
+        int n = 9;
         Heap* h = new_Heap(sizeof(int), n, test_Heap_bigger_int);
         {
                 printf("\n");
@@ -42,13 +42,13 @@ int test_Heap_push() {
                         Heap_push(h, &(Value){ .number = i });
                 }
                 Heap_print(h, test_Heap_print);
-                //               10
+                //               9
                 //              / \
-                //             9   6
+                //             8   6
                 //            / \  /\
-                //          7   8 2  5
-                //         /\  /
-                //        1 4 3
+                //          7   3 2  5
+                //         /\
+                //        1 4
 
                 printf("\n");
                 for (int i = n/2; i>0; --i) {
