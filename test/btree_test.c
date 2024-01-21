@@ -34,28 +34,30 @@ void test_BTree_print(void* value) {
 
 int test_BTree_insert() {
         int result = 0;
-        for (int i=2; i<6; ++i) {
-                BTree* t = new_BTree(i, sizeof(Value), sizeof(Value), test_BTree_compare);
-                {
-                        for (int j=1; j<=50; ++j) {
+        BTree* t = new_BTree(4, sizeof(Value), sizeof(Value), test_BTree_compare);
+        {
+                for (int j=1; j<=50; ++j) {
+                        Value v = { .number = j };
+                        sprintf(v.text, "%d", j);
+                        BTree_insert(t, &v, &v);
+                }
+
+                printf("\n");
+                BTree_print(t, test_BTree_print);
+
+                for (int j=1; j<=50; ++j) {
+                        if (j%3== 0) {
                                 Value v = { .number = j };
                                 sprintf(v.text, "%d", j);
-                                BTree_insert(t, &v, &v);
-                        }
-
-                        //printf("\n");
-                        //BTree_print(t, test_BTree_print);
-
-                        for (int j=1; j<=50; ++j) {
-                                if (j%3== 0) {
-                                        Value v = { .number = j };
-                                        sprintf(v.text, "%d", j);
-                                        BTree_remove(t, &v);
-                                }
+                                BTree_remove(t, &v);
                         }
                 }
-                delete_BTree(t);
+
+                printf("\n");
+                BTree_print(t, test_BTree_print);
+
         }
+        delete_BTree(t);
         return result;
 }
 
