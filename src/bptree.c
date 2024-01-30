@@ -659,12 +659,12 @@ void BpTree_remove_entry(BpTree* t, BpTreeNode* n, int key, BpTreeNode* entry) {
         /* Determine minimum allowable size of node,
          * to be preserved after deletion.
          */
-        int order_keys = n->leaf ? find_split(t->order - 1) : find_split(t->order) - 1;
+        int min_keys = n->leaf ? find_split(t->order - 1) : find_split(t->order) - 1;
 
         /* Case:  node stays at or above minimum.
          * (The simple case.)
          */
-        if (n->count >= order_keys) {
+        if (n->count >= min_keys) {
                 return;
         }
 
