@@ -499,6 +499,10 @@ struct BTree {
 
 BTree* new_BTree(int min_degree, size_t key_size, size_t value_size,
                 BTreeCompareFn compare) {
+        if (min_degree < 2) {
+                printf("\n[ERROR] Minimum degree: %d < 2\n", min_degree);
+                exit(1);
+        }
         BTree* t = calloc(1, sizeof(BTree));
         t->min = min_degree;
         t->key_size = key_size;

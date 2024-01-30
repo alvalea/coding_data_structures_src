@@ -10,7 +10,7 @@ typedef char string[STR];
 
 typedef struct BpTreeNode {
         bool leaf;
-        int min;	 // Minimum degree (defines the range for number of items)
+        int order;	 // Order of the tree
         int count;	 // Current number of items
         int* keys;
         void** c;
@@ -23,12 +23,12 @@ typedef struct BpTreeNodeEntry {
 } BpTreeNodeEntry;
 
 static
-BpTreeNode* new_BpTreeNode(bool leaf, int min) {
+BpTreeNode* new_BpTreeNode(bool leaf, int order) {
         BpTreeNode* n = calloc(1, sizeof(BpTreeNode));
         n->leaf = leaf;
-        n->min = min;
-        n->keys = calloc(min - 1, sizeof(int));
-        n->c    = calloc(min, sizeof(void*));
+        n->order = order;
+        n->keys = calloc(order - 1, sizeof(int));
+        n->c    = calloc(order, sizeof(void*));
         return n;
 }
 
@@ -55,7 +55,7 @@ void delete_BpTreeNode(BpTreeNode* n) {
 
 static
 bool BpTreeNode_full(BpTreeNode* n) {
-        return n->count == n->min - 1;
+        return n->count == n->order - 1;
 }
 
 static
@@ -153,9 +153,9 @@ void BpTreeNode_remove(BpTreeNode* n, int key, BpTreeNode* entry) {
         // Set the other c to NULL for tidiness.
         // A leaf uses the last pointer to point to the next leaf.
         if (n->leaf) {
-                memset(&n->c[n->count], 0, sizeof(void*) * ((n->min - 1) - n->count));
+                memset(&n->c[n->count], 0, sizeof(void*) * ((n->order - 1) - n->count));
         } else {
-                memset(&n->c[n->count + 1], 0, sizeof(void*) * (n->min - (n->count + 1)));
+                memset(&n->c[n->count + 1], 0, sizeof(void*) * (n->order - (n->count + 1)));
         }
 }
 
@@ -184,19 +184,19 @@ int BpTreeNode_neighbor_index(BpTreeNode* n) {
 //===========================================================================
 
 struct BpTree {
-        int min;
+        int order;
         size_t value_size;
         BpTreeNode* root;
 };
 
-BpTree* new_BpTree(int min_degree, size_t value_size) {
-        if (min_degree < 3) {
-                printf("\n[ERROR] Degree: %d < Minimum Degree: 3\n", min_degree);
+BpTree* new_BpTree(int order, size_t value_size) {
+        if (order < 3) {
+                printf("\n[ERROR] Order: %d < Minimum Order: 3\n", order);
                 exit(1);
         }
 
         BpTree* t = calloc(1, sizeof(BpTree));
-        t->min = min_degree;
+        t->order = order;
         t->value_size = value_size;
         return t;
 }
@@ -247,7 +247,7 @@ BpTreeNodeEntry BpTree_find_entry(BpTree* t, int key) {
 
 static
 void BpTree_create_root(BpTree* t, int key, void* value) {
-        BpTreeNode* n = new_BpTreeNode(true, t->min);
+        BpTreeNode* n = new_BpTreeNode(true, t->order);
         n->keys[0] = key;
         n->c[0] = value;
         n->count++;
@@ -255,17 +255,17 @@ void BpTree_create_root(BpTree* t, int key, void* value) {
 }
 
 static
-int find_split(int min) {
-        if (min % 2 == 0) {
-                return min/2;
+int find_split(int order) {
+        if (order % 2 == 0) {
+                return order/2;
         } else {
-                return min/2 + 1;
+                return order/2 + 1;
         }
 }
 
 static
 void BpTree_insert_into_new_root(BpTree* t, BpTreeNode* left, int key, BpTreeNode* right) {
-        BpTreeNode* root = new_BpTreeNode(false, t->min);
+        BpTreeNode* root = new_BpTreeNode(false, t->order);
         root->keys[0] = key;
         root->c[0] = left;
         root->c[1] = right;
@@ -298,16 +298,16 @@ int BpTree_node_split_allocation(BpTree* t, BpTreeNode* old_node, int left_index
          * half the keys and c to the
          * old and half to the new.
          */  
-        int split = find_split(t->min);
+        int split = find_split(t->order);
         k_prime = temp_keys[split - 1];
 
         memcpy(&old_node->keys[0], &temp_keys[0], sizeof(int) * (split - 1));
         memcpy(&old_node->c[0], &temp_c[0], sizeof(void*) * split);
         old_node->count = split - 1;
 
-        memcpy(&new_node->keys[0], &temp_keys[split], sizeof(int) * (t->min - split));
-        memcpy(&new_node->c[0], &temp_c[split], sizeof(void*) * (t->min + 1 - split));
-        new_node->count = t->min - split;
+        memcpy(&new_node->keys[0], &temp_keys[split], sizeof(int) * (t->order - split));
+        memcpy(&new_node->c[0], &temp_c[split], sizeof(void*) * (t->order + 1 - split));
+        new_node->count = t->order - split;
 
         new_node->parent = old_node->parent;
         for (int i = 0; i <= new_node->count; i++) {
@@ -329,9 +329,9 @@ void BpTree_node_split(BpTree* t, BpTreeNode* old_node, int left_index, int key,
          * the other half to the new.
          */
         int k_prime = 0;
-        BpTreeNode* new_node = new_BpTreeNode(false, t->min);
-        BpTreeNode** temp_c = calloc(t->min + 1, sizeof(BpTreeNode*));
-        int* temp_keys = calloc(t->min, sizeof(int));
+        BpTreeNode* new_node = new_BpTreeNode(false, t->order);
+        BpTreeNode** temp_c = calloc(t->order + 1, sizeof(BpTreeNode*));
+        int* temp_keys = calloc(t->order, sizeof(int));
         {
                 k_prime = BpTree_node_split_allocation(t, old_node, left_index, key, right,
                                 new_node, temp_keys, (void**)temp_c);
@@ -384,7 +384,7 @@ static
 void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, void* value,
                 BpTreeNode* new_leaf, int* temp_keys, void** temp_c) {
         int insertion_index = 0;
-        while (insertion_index < t->min - 1 && leaf->keys[insertion_index] < key) {
+        while (insertion_index < t->order - 1 && leaf->keys[insertion_index] < key) {
                 insertion_index++;
         }
 
@@ -402,34 +402,34 @@ void BpTree_leaf_split_allocation(BpTree* t, BpTreeNode* leaf, int key, void* va
 
         leaf->count = 0;
 
-        int split = find_split(t->min - 1);
+        int split = find_split(t->order - 1);
 
         memcpy(&leaf->keys[0], &temp_keys[0], sizeof(int) * split);
         memcpy(&leaf->c[0], &temp_c[0], sizeof(void*) * split);
         leaf->count = split;
 
-        memcpy(&new_leaf->keys[0], &temp_keys[split], sizeof(int) * (t->min - split));
-        memcpy(&new_leaf->c[0], &temp_c[split], sizeof(void*) * (t->min - split));
-        new_leaf->count = t->min - split;
+        memcpy(&new_leaf->keys[0], &temp_keys[split], sizeof(int) * (t->order - split));
+        memcpy(&new_leaf->c[0], &temp_c[split], sizeof(void*) * (t->order - split));
+        new_leaf->count = t->order - split;
 }
 
 static
 void BpTree_leaf_split(BpTree* t, BpTreeNode* leaf, int key, void* value) {
-        BpTreeNode* new_leaf = new_BpTreeNode(true, t->min);
+        BpTreeNode* new_leaf = new_BpTreeNode(true, t->order);
 
-        int* temp_keys = calloc(t->min, sizeof(int));
-        void** temp_c = calloc(t->min, sizeof(void *));
+        int* temp_keys = calloc(t->order, sizeof(int));
+        void** temp_c = calloc(t->order, sizeof(void *));
         {
                 BpTree_leaf_split_allocation(t, leaf, key, value, new_leaf, temp_keys, temp_c);
         }
         free(temp_c);
         free(temp_keys);
 
-        new_leaf->c[t->min - 1] = leaf->c[t->min - 1];
-        leaf->c[t->min - 1] = new_leaf;
+        new_leaf->c[t->order - 1] = leaf->c[t->order - 1];
+        leaf->c[t->order - 1] = new_leaf;
 
-        memset(&leaf->c[leaf->count], 0, sizeof(void*) * ((t->min - 1) - leaf->count));
-        memset(&new_leaf->c[new_leaf->count], 0, sizeof(void*) * ((t->min - 1) - new_leaf->count));
+        memset(&leaf->c[leaf->count], 0, sizeof(void*) * ((t->order - 1) - leaf->count));
+        memset(&new_leaf->c[new_leaf->count], 0, sizeof(void*) * ((t->order - 1) - new_leaf->count));
 
         new_leaf->parent = leaf->parent;
         int new_key = new_leaf->keys[0];
@@ -564,7 +564,7 @@ void BpTree_merge(BpTree* t, BpTreeNode* n, BpTreeNode* neighbor, int neighbor_i
                 memmove(&neighbor->c[neighbor_insertion_index], &n->c[0],
                                 sizeof(void*) * n->count);
                 neighbor->count += n->count;
-                neighbor->c[t->min - 1] = n->c[t->min - 1];
+                neighbor->c[t->order - 1] = n->c[t->order - 1];
         }
 
         BpTree_remove_entry(t, n->parent, k_prime, n);
@@ -659,12 +659,12 @@ void BpTree_remove_entry(BpTree* t, BpTreeNode* n, int key, BpTreeNode* entry) {
         /* Determine minimum allowable size of node,
          * to be preserved after deletion.
          */
-        int min_keys = n->leaf ? find_split(t->min - 1) : find_split(t->min) - 1;
+        int order_keys = n->leaf ? find_split(t->order - 1) : find_split(t->order) - 1;
 
         /* Case:  node stays at or above minimum.
          * (The simple case.)
          */
-        if (n->count >= min_keys) {
+        if (n->count >= order_keys) {
                 return;
         }
 
@@ -684,7 +684,7 @@ void BpTree_remove_entry(BpTree* t, BpTreeNode* n, int key, BpTreeNode* entry) {
         int k_prime = n->parent->keys[k_prime_index];
         BpTreeNode* neighbor = neighbor_index == -1 ? n->parent->c[1] : 
                 n->parent->c[neighbor_index];
-        int capacity = n->leaf ? t->min : t->min - 1;
+        int capacity = n->leaf ? t->order : t->order - 1;
 
         if (neighbor->count + n->count < capacity) {
                 BpTree_merge(t, n, neighbor, neighbor_index, k_prime);

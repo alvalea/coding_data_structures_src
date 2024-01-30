@@ -6,26 +6,29 @@
 static
 void test_BpTree_print(void* value) {
         int* v = (int*)value;
-        printf("%d.", *v);
+        printf("[%d] ", *v);
 }
 
 int test_BpTree_insert() {
         int result = 0;
-        for (int i=3; i<6; ++i) {
+        for (int i=3; i<4; ++i) {
                 BpTree* t = new_BpTree(i, sizeof(int));
                 {
                         for (int j=50; j>0; --j) {
-                                BpTree_insert(t, j, &(int){j});
+                                BpTree_insert(t, j, &(int){j*2});
                         }
 
-                        //printf("\n");
-                        //BpTree_print(t, test_BpTree_print);
+                        printf("\n");
+                        BpTree_print(t, test_BpTree_print);
 
                         for (int j = 50; j > 0; --j) {
                                 if (j%3== 0) {
                                         BpTree_remove(t, j);
                                 }
                         }
+
+                        printf("\n");
+                        BpTree_print(t, test_BpTree_print);
                 }
                 delete_BpTree(t);
         }
