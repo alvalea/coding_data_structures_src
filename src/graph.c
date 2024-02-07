@@ -46,7 +46,7 @@ void delete_Graph(Graph* g) {
         free(g);
 }
 
-int Graph_add_node(Graph* g, void* item) {
+int Graph_add_vertex(Graph* g, void* item) {
         size_t len = Array_len(g->vertices);
         if (len < g->initial_capacity) {
                 len = g->initial_capacity;

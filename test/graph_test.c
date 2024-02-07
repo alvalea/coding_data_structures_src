@@ -21,7 +21,7 @@ int test_Graph_print() {
         Graph* g = new_Graph(sizeof(Value), 10);
         {
                 for (int i=0; i<4; ++i) {
-                        Graph_add_node(g, &(Value){.number=i*2});
+                        Graph_add_vertex(g, &(Value){.number=i*2});
                 }
 
                 Graph_add_edge(g, 0, 1, 1);
@@ -56,7 +56,7 @@ int test_Graph_search(TestGraphFn fn) {
         Graph* g = new_Graph(sizeof(Value), 10);
         {
                 for (int i=0; i<4; ++i) {
-                        Graph_add_node(g, &(Value){.number=i*2});
+                        Graph_add_vertex(g, &(Value){.number=i*2});
                 }
 
                 Graph_add_edge(g, 0, 1, 1);
@@ -92,7 +92,7 @@ int test_Graph_mst() {
         Graph* g = new_Graph(sizeof(Value), 10);
         {
                 for (int i=0; i<5; ++i) {
-                        Graph_add_node(g, &(Value){.number=i*2});
+                        Graph_add_vertex(g, &(Value){.number=i*2});
                 }
 
                 Graph_add_edge(g, 0, 1, 2);
@@ -140,7 +140,7 @@ int test_Graph_path() {
         Graph* g = new_Graph(sizeof(Value), 10);
         {
                 for (int i=0; i<5; ++i) {
-                        Graph_add_node(g, 
+                        Graph_add_vertex(g,
                                         &(Value){
                                         .number=i,
                                         .number1=i,
