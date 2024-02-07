@@ -130,32 +130,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\algo\array.c" />
-    <ClCompile Include="src\algo\array_test.c" />
-    <ClCompile Include="src\algo\bptree.c" />
-    <ClCompile Include="src\algo\bptree_test.c" />
-    <ClCompile Include="src\algo\btree.c" />
-    <ClCompile Include="src\algo\btree_test.c" />
-    <ClCompile Include="src\algo\hashmap.c" />
-    <ClCompile Include="src\algo\hashmap_test.c" />
-    <ClCompile Include="src\algo\heap.c" />
-    <ClCompile Include="src\algo\heap_test.c" />
-    <ClCompile Include="src\algo\list.c" />
-    <ClCompile Include="src\algo\list_test.c" />
-    <ClCompile Include="src\algo\map.c" />
-    <ClCompile Include="src\algo\map_test.c" />
-    <ClCompile Include="src\algo\queue.c" />
-    <ClCompile Include="src\algo\queue_test.c" />
-    <ClCompile Include="src\algo\sort.c" />
-    <ClCompile Include="src\algo\sort_test.c" />
-    <ClCompile Include="src\test.c" />
+    <ClCompile Include="cmd\testbin\main.c" />
+    <ClCompile Include="src\array.c" />
+    <ClCompile Include="src\bptree.c" />
+    <ClCompile Include="src\btree.c" />
+    <ClCompile Include="src\graph.c" />
+    <ClCompile Include="src\hashmap.c" />
+    <ClCompile Include="src\heap.c" />
+    <ClCompile Include="src\list.c" />
+    <ClCompile Include="src\map.c" />
+    <ClCompile Include="src\queue.c" />
+    <ClCompile Include="src\sort.c" />
+    <ClCompile Include="test\array_test.c" />
+    <ClCompile Include="test\bptree_test.c" />
+    <ClCompile Include="test\btree_test.c" />
+    <ClCompile Include="test\graph_test.c" />
+    <ClCompile Include="test\hashmap_test.c" />
+    <ClCompile Include="test\heap_test.c" />
+    <ClCompile Include="test\list_test.c" />
+    <ClCompile Include="test\map_test.c" />
+    <ClCompile Include="test\queue_test.c" />
+    <ClCompile Include="test\sort_test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algo\container.h" />
     <ClInclude Include="include\algo\container_test.h" />
     <ClInclude Include="include\algo\sort.h" />
     <ClInclude Include="include\algo\sort_test.h" />
-    <ClInclude Include="include\test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

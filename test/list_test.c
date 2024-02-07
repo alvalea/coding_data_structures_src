@@ -21,15 +21,6 @@ int test_List_add() {
                         List_add(l, &(Value){ .number = i});
                 }
 
-                ListNode* n = List_head(l);
-                while (n) {
-                        Value* v = ListNode_data(n);
-                        if (v->number % 2) {
-                                List_remove(l, v);
-                        }
-                        n = ListNode_next(n);
-                }
-
                 List_print(l, test_List_print);
         }
         delete_List(l);

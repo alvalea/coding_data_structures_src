@@ -72,6 +72,69 @@
     <ClCompile Include="src\algo\bptree_test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\array.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bptree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\btree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hashmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\heap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\map.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sort.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\array_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\bptree_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\btree_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\graph_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\hashmap_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\heap_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\list_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\map_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\queue_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\sort_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd\testbin\main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algo\container.h">
