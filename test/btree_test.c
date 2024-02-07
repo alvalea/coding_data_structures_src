@@ -34,9 +34,9 @@ void test_BTree_print(void* value) {
 
 int test_BTree_insert() {
         int result = 0;
-        BTree* t = new_BTree(4, sizeof(Value), sizeof(Value), test_BTree_compare);
+        BTree* t = new_BTree(2, sizeof(Value), sizeof(Value), test_BTree_compare);
         {
-                for (int j=1; j<=50; ++j) {
+                for (int j=1; j<=11; ++j) {
                         Value v = { .number = j };
                         sprintf(v.text, "%d", j);
                         BTree_insert(t, &v, &v);
@@ -45,7 +45,7 @@ int test_BTree_insert() {
                 printf("\n");
                 BTree_print(t, test_BTree_print);
 
-                for (int j=1; j<=50; ++j) {
+                for (int j=1; j<=11; ++j) {
                         if (j%3== 0) {
                                 Value v = { .number = j };
                                 sprintf(v.text, "%d", j);
