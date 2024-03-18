@@ -71,7 +71,7 @@ int test_Graph_search(TestGraphFn fn) {
                 Graph_add_edge(g, 2, 3, 1);
                 Graph_add_edge(g, 3, 2, 1);
 
-                //fn(g, 2, test_print_item);
+                fn(g, 2, test_print_item);
         }
         delete_Graph(g);
         return result;
@@ -114,19 +114,19 @@ int test_Graph_mst() {
                 Graph_add_edge(g, 4, 2, 7);
                 Graph_add_edge(g, 4, 3, 9);
 
-                //Graph_print(g, test_print_int);
+                Graph_print(g, test_print_int);
 
                 Graph_mst(g);
 
-                //Graph_print(g, test_print_int);
+                Graph_print(g, test_print_int);
         }
         delete_Graph(g);
         return result;
 }
 
 static
-void test_graph_shortest_path(int weight, Array* path) {
-        printf("weight: %d\n", weight);
+void test_graph_shortest_path(int cost, Array* path) {
+        printf("cost: %d\n", cost);
         size_t len = Array_len(path);
         for (int i=0; i<len; ++i) {
                 Value* v = *(Value**)Array_get(path, i);
@@ -169,9 +169,9 @@ int test_Graph_path() {
                 Graph_add_edge(g, 4, 2, 7);
                 Graph_add_edge(g, 4, 3, 9);
 
-                //printf("\n");
-                //printf("src: 0 dst: 2 ");
-                //Graph_path(g, 0, 2, test_graph_shortest_path);
+                printf("\n");
+                printf("src: 0 dst: 2 ");
+                Graph_path(g, 0, 2, test_graph_shortest_path);
         }
         delete_Graph(g);
         return result;

@@ -284,7 +284,7 @@ void Graph_path_vertices(Graph* g, int vertex, Array* path, Array* vertices) {
 }
 
 static
-int Graph_path_weight(Graph* g, Array* path, int dst) {
+int Graph_path_cost(Graph* g, Array* path, int dst) {
         Edge* edge = Array_get(path, dst);
         Vertex* vertex = Array_get(g->vertices, edge->dst);
         return edge->weight;
@@ -292,12 +292,12 @@ int Graph_path_weight(Graph* g, Array* path, int dst) {
 
 static
 void Graph_path_result(Graph* g, GraphPathFn fn, Array* path, int dst) {
-        int weight = Graph_path_weight(g, path, dst);
+        int cost = Graph_path_cost(g, path, dst);
         size_t len = Array_len(g->vertices);
         Array* vertices = new_Array(sizeof(void*), len);
         {
                 Graph_path_vertices(g, dst, path, vertices);
-                fn(weight, vertices);
+                fn(cost, vertices);
         }
         delete_Array(vertices);
 }

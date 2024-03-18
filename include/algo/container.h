@@ -144,7 +144,7 @@ void Graph_bfs(Graph* g, int vertex, GraphSearchFn fn);
 
 void Graph_mst(Graph* g);
 
-typedef void (*GraphPathFn)(int weight, Array* path);
+typedef void (*GraphPathFn)(int cost, Array* path);
 void Graph_path(Graph* g, int src, int dst, GraphPathFn fn);
 
 #endif
