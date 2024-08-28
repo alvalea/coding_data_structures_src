@@ -1,2 +1,3 @@
-# c_algo
-Algorithms and Data Structures in C
+# Coding Data Structures
+
+Source code for the book Coding Data Structures
